@@ -47,32 +47,26 @@ class Controller(metaclass=Singleton):
         return True if ret == self.CMD_ACK else False
 
     def add_servo(self, id, type):
-        cmd = struct.pack('>HBBBB', self.CMD_HEADER, 
+        cmd = struct.pack('HBBBB', self.CMD_HEADER, 
                                     self.CMD_ADD_SERVO, 
                                     2, id, type)
         print(f"Adding servo: {cmd!r}")
         self.write(cmd, wait=True)
 
-    def write_joint_position(self, id, type, position):
-        cmd = struct.pack('>HBBBH', self.CMD_HEADER, 
-                                    self.CMD_SERVO_GOAL_POSITION, 
-                                    3, id, position)
-        print(f"Writing goal position: {cmd!r}")
-        self.write(cmd)
+    def write_joint_position(self, id, position):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_SERVO_GOAL_POSITION, 3, id]))
+        self.write(struct.pack('H', position), wait=True)
 
-    def write_joint_speed(self, id, type, speed):
-        cmd = struct.pack('>HBBBH', self.CMD_HEADER, 
-                                    self.CMD_SERVO_MOVING_SPEED, 
-                                    3, id, speed)
-        print(f"Writing moving speed: {cmd!r}")
-        self.write(cmd)
+    def write_joint_speed(self, id, speed):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_SERVO_MOVING_SPEED, 3, id]))
+        self.write(struct.pack('H', speed), wait=True)
 
-    def write_joint_torque(self, id, type, torque):
-        cmd = struct.pack('>HBBBH', self.CMD_HEADER, 
-                                    self.CMD_SERVO_TORQUE_LIMIT, 
-                                    3, id, torque)
-        print(f"Writing torque limit: {cmd!r}")
-        self.write(cmd)
+    def write_joint_torque(self, id, torque):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_SERVO_TORQUE_LIMIT, 3, id]))
+        self.write(struct.pack('H', torque), wait=True)
 
 
 

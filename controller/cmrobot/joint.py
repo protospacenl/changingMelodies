@@ -32,13 +32,13 @@ class Joint():
 
 
     def set_goal_position(self, position):
-        self.__controller.write_joint_position(self.id, self.type, position)
+        self.__controller.write_joint_position(self.id, position)
 
     def set_moving_speed(self, speed):
-        self.__controller.write_joint_speed(self.id, self.type, speed)
+        self.__controller.write_joint_speed(self.id, speed)
 
     def set_torque_limit(self, torque):
-        self.__controller.write_joint_torque(self.id, self.type, torque)
+        self.__controller.write_joint_torque(self.id, torque)
 
     def move_to(self, position, speed=0, torque=0):
         if speed == 0:
