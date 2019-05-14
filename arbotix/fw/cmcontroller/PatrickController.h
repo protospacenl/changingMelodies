@@ -22,8 +22,6 @@
 
 #include "ax12.h"
 
-/* pose engine runs at 30Hz (33ms between frames) 
-   recommended values for interpolateSetup are of the form X*PATRICK_FRAME_LENGTH - 1 */
 #define PATRICK_FRAME_LENGTH      33
 
 #define MAX_SERVOS                3
@@ -53,6 +51,8 @@ class PatrickController
     PatrickController(long baud);               // baud usually 1000000
 
     int addServo(uint8_t id, uint8_t type);
+    int moveServo(uint8_t id, uint16_t pos, uint16_t speed);
+
    
   private:  
     uint8_t nservos;

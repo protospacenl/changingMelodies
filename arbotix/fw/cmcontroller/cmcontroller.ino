@@ -1,8 +1,15 @@
 #include "ax12.h"
 #include "PatrickController.h"
 
-#define SERIAL_TIMEOUT      5000
-uint8_t CMD_HEADER[2] = {0xff, 0xff};
+#define SERIAL_TIMEOUT            5000
+
+uint8_t CMD_HEADER[2]           = {0xff, 0xff};
+#define CMD_RESP_ACK              0xff
+#define CMD_RESP_ERR              0xee
+#define CMD_ADD_SERVO             0x01
+#define CMD_SERVO_GOAL_POSITION   0x1E
+#define CMD_SERVO_MOVING_SPEED    0x20
+#define CMD_SERVO_TORQUE_LIMIT    0x22
 
 int mode = 0;
 
@@ -39,12 +46,38 @@ typedef struct __attribute__(( packed)) command_t {
 command_t __command;
 PatrickController __patrick = PatrickController(1000000); 
 
+int handle_command(command_t *msg, PatrickController *controller)
+{
+    int retval = -1;
+
+    if (msg->cmd == CMD_ADD_SERVO) {
+        cmd_add_servo_t * cmd = (cmd_add_servo_t*)&msg->params;
+        retval = controller->addServo(cmd->id, cmd->type);
+        if (retval > 0) {
+            Serial.write(retval);
+        } else {
+            Serial.write(retval);
+        }
+    } else if (msg->cmd == CMD_SERVO_GOAL_POSITION) {
+        cmd_position_t * cmd = (cmd_position_t*)&msg->params;
+        Serial.write(cmd->id);
+        Serial.print(cmd->position);
+    } else if (msg->cmd == CMD_SERVO_MOVING_SPEED) {
+        cmd_speed_t * cmd = (cmd_speed_t*)&msg->params;
+    } else if (msg->cmd == CMD_SERVO_TORQUE_LIMIT) {
+        cmd_torque_t * cmd = (cmd_torque_t*)&msg->params;
+    } else {
+        ;
+    }
+}
+
+
 void setup(void)
 {
     Serial.begin(19200);
     Serial.setTimeout(SERIAL_TIMEOUT);
     delay(500);
-    Serial.write(0xff);
+    Serial.write(CMD_RESP_ACK);
 }
 
 void loop(void)
@@ -68,20 +101,16 @@ void loop(void)
             }
         } else if(mode == 3) {   // next byte is length
             if (Serial.available() >= __command.size) {
+                int retval = -1;
                 Serial.readBytes((char*)&__command.params, __command.size);
-                if (__command.cmd == 0x01) {
-                    int retval;
-                    cmd_add_servo_t *cmd = (cmd_add_servo_t*)&__command.params;
-                    retval = __patrick.addServo(cmd->id, cmd->type);
-                    if (retval < 0) {
-                        Serial.write(0xee);
-                    } else {
-                        Serial.write((uint8_t)retval);
-                        Serial.write(0xff);
-                    }
+                
+                retval = handle_command(&__command, &__patrick);
+                if (retval < 0) {
+                    Serial.write(CMD_RESP_ERR);
                 } else {
-                    Serial.write(0xff);
+                    Serial.write(CMD_RESP_ACK);
                 }
+
                 mode = 0;
             }
         } 
