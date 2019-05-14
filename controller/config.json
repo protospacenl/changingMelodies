@@ -21,41 +21,41 @@
             "port": "/dev/ttyUSB0",
             "baudrate": 19200,
             "timeout": 1
-        },
-
-        "joints": [
-            {   
-                "name": "shoulder_rot",
-                "type": "AX",
-                "id": 1,
-                "params": {
-                    "cw_angle_limit": 202,
-                    "ccw_angle_limit": 601,
-                    "torque_limit": 1.0
-                }
-            },
-            {
-                "name": "shoulder_ud",
-                "type": "MX",
-                "id": 2,
-                "params": {
-                    "cw_angle_limit": 198,
-                    "ccw_angle_limit": 799,
-                    "torque_limit": 1.0
-                }
-            },
-            {   
-                "name": "wrist",
-                "type": "AX",
-                "id": 3,
-                "params": {
-                    "cw_angle_limit": 190,
-                    "ccw_angle_limit": 788,
-                    "torque_limit": 1.0
-                }
-            }
-        ]
+        }
     },
+
+    "joints": [
+        {   
+            "name": "shoulder_rot",
+            "type": "AX",
+            "id": 1,
+            "params": {
+                "cw_angle_limit": 202,
+                "ccw_angle_limit": 601,
+                "torque_limit": 1.0
+            }
+        },
+        {
+            "name": "shoulder_ud",
+            "type": "MX",
+            "id": 2,
+            "params": {
+                "cw_angle_limit": 198,
+                "ccw_angle_limit": 799,
+                "torque_limit": 1.0
+            }
+        },
+        {   
+            "name": "wrist",
+            "type": "AX",
+            "id": 3,
+            "params": {
+                "cw_angle_limit": 190,
+                "ccw_angle_limit": 788,
+                "torque_limit": 1.0
+            }
+        }
+    ],
 
     "positions": {
         "arm": {

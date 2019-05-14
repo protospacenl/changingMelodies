@@ -4,15 +4,17 @@ from cmrobot.joint import JointAX, JointMX
 from cmrobot.controller import Controller
 
 class Robot():
-    def __init__(self, controller=None, joints=None):
+    def __init__(self, controller=None):
         self.__controller = Controller(**controller)
         self.__joints = {}
-        self.add_joints(joints)
 
     @property
     def joints(self):
         return list(self.__joints.keys())
-    
+   
+    def connect(self):
+        return self.__controller.connect()
+
     def add_joints(self, joints):
         for j in joints:
             self.add_joint(j)
@@ -32,6 +34,7 @@ class Robot():
         elif joint['type'].lower() == 'mx':
             nj = JointMX(**joint, controller=self.__controller)
 
+        self.__controller.add_servo(nj.id, nj.type_id)
         self.__joints[nj.name] = nj
         
         return nj

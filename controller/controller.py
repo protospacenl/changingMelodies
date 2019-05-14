@@ -60,13 +60,18 @@ def main(argv):
     robot_config = config['robot']
     head_config = config['head']
 
+    robot = Robot(**config['robot'])
+    robot.connect()
+
+    joints = config['joints']
+    robot.add_joints(joints)
+
     sensors = config['sensors']
 
     arm_positions = config['positions']['arm']
     tool_positions = config['positions']['tool']
     playlist = config['playlist']
 
-    robot = Robot(**config['robot'])
     print(f"Created robot with joints {robot.joints}")
 
     for _ in playlist:

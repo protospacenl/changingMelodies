@@ -1,19 +1,15 @@
-import struct
-
 from cmrobot.controller import Controller
 
 class Joint():
     MAX_MOVING_SPEED    = 0x3FF
     MAX_TORQUE_LIMIT    = 0x3FF
+    SERVO_TYPE_AX       = 0x00
+    SERVO_TYPE_MX       = 0x01
 
-    CMD_HEADER          = b'\xFF'
-    CMD_GOAL_POSITION   = b'\x1E'
-    CMD_MOVING_SPEED    = b'\x20'
-    CMD_TORQUE_LIMIT    = b'\x22'
-
-    def __init__(self, name="noname", type="AX", id=0, params={}, controller=None):
+    def __init__(self, name="noname", type="AX", type_id=0, id=0, params={}, controller=None):
         self.__name = name
         self.__type = type
+        self.__type_id = type_id
         self.__id = id
         self.__params = params
         self.__controller = controller
@@ -30,20 +26,19 @@ class Joint():
     def type(self):
         return self.__type
 
+    @property
+    def type_id(self):
+        return self.__type_id
+
+
     def set_goal_position(self, position):
-        cmd = struct.pack('>ccBH', self.CMD_HEADER, self.CMD_GOAL_POSITION, self.id, position)
-        print(f"Writing goal position: {cmd!r}")
-        self.__controller.write(cmd)
+        self.__controller.write_joint_position(self.id, self.type, position)
 
     def set_moving_speed(self, speed):
-        cmd = struct.pack('>ccBH', self.CMD_HEADER, self.CMD_MOVING_SPEED, self.id, speed)
-        print(f"Writing moving speed: {cmd!r}")
-        self.__controller.write(cmd)
+        self.__controller.write_joint_speed(self.id, self.type, speed)
 
     def set_torque_limit(self, torque):
-        cmd = struct.pack('>ccBH', self.CMD_HEADER, self.CMD_TORQUE_LIMIT, self.id, torque)
-        print(f"Writing torque limit: {cmd!r}")
-        self.__controller.write(cmd)
+        self.__controller.write_joint_torque(self.id, self.type, torque)
 
     def move_to(self, position, speed=0, torque=0):
         if speed == 0:
@@ -66,7 +61,8 @@ class JointMX(Joint):
     MAX_TORQUE_LIMIT    = 0xfff
 
     def __init__(self, **kw):
-        super(JointMX, self).__init__(**kw)
+        super(JointMX, self).__init__(type_id=self.SERVO_TYPE_MX, **kw)
+        
 
     def move_to(self, position, speed=0, torque=0):
         print("MX move")
@@ -78,7 +74,7 @@ class JointMX(Joint):
 
 class JointAX(Joint):
     def __init__(self, **kw):
-        super(JointAX, self).__init__(**kw)
+        super(JointAX, self).__init__(type_id=self.SERVO_TYPE_AX, **kw)
 
     def move_to(self, position, speed=0, torque=0):
         print("AX move")
