@@ -22,11 +22,11 @@
 
 #include "ax12.h"
 
-#define PATRICK_FRAME_LENGTH      33
+#define PATRICK_FRAME_DELAY 33
 
-#define MAX_SERVOS                3
-#define SERVO_TYPE_AX             0
-#define SERVO_TYPE_MX             1
+#define MAX_SERVOS          3
+#define SERVO_TYPE_AX       0
+#define SERVO_TYPE_MX       1
 
 #define AX_STEPSIZE        0.111328125f
 #define AX_STEPSIZE_RECIP  8.982456f
@@ -51,9 +51,32 @@ class PatrickController
     PatrickController(long baud);               // baud usually 1000000
 
     int addServo(uint8_t id, uint8_t type);
-    int moveServo(uint8_t id, uint16_t pos, uint16_t speed);
 
-   
+    void setServoSpeed(uint8_t id, uint16_t speed) {
+        dxlSetGoalSpeed(id, speed);
+        delay(PATRICK_FRAME_DELAY);
+    };
+
+    void setServoTorque(uint8_t id, uint16_t torque) {
+        dxlSetRunningTorqueLimit(id, torque);
+        delay(PATRICK_FRAME_DELAY);
+    };
+
+    void setServoPosition(uint8_t id, uint16_t position) {
+        dxlSetGoalPosition(id, position);
+        delay(PATRICK_FRAME_DELAY);
+    };
+
+    void setServoPosition(uint8_t id, uint16_t position, uint16_t speed) {
+        setServoSpeed(id, speed);
+        setServoPosition(id, position);
+    };
+
+    void setServoPosition(uint8_t id, uint16_t position, uint16_t speed, uint16_t torque) {
+        setServoTorque(id, torque);
+        setServoPosition(id, position, speed);
+    };
+
   private:  
     uint8_t nservos;
     servo_t servos[MAX_SERVOS];

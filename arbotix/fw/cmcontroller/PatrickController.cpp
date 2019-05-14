@@ -43,9 +43,10 @@ int PatrickController::addServo(uint8_t id, uint8_t type)
     servos[nservos].id = id;
     servos[nservos].type = type;
 
+    dxlLEDOn(id);
+    dxlTorqueOn(id);
+    
     nservos++;
 
     return nservos;
 }
-
-

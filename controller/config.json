@@ -59,9 +59,9 @@
 
     "positions": {
         "arm": {
-            "rest": { "joints": [ { "name": "shoulder_rot", "pos": 123},
-                                  { "name": "shoulder_ud",  "pos": 123},
-                                  { "name": "wrist",        "pos": 123} ] },
+            "rest": { "joints": [ { "name": "shoulder_rot", "pos": 512},
+                                  { "name": "shoulder_ud",  "pos": 512},
+                                  { "name": "wrist",        "pos": 512} ] },
             "up":   { "joints": [ { "name": "shoulder_rot", "pos": 123},
                                   { "name": "shoulder_ud",  "pos": 123},
                                   { "name": "wrist",        "pos": 123} ] }
@@ -73,10 +73,12 @@
 
     "playlist": [
         { "target": "arm",  "cmd": "move",  "position": "rest",          "speed": 100 },
-        { "target": "tool", "cmd": "move",  "position": "finger_center", "speed": 100 },
-        { "target": "arm",  "cmd": "move",  "position": "up",            "speed": 300},
-        { "target": "arm",  "cmd": "relax", "joint": "wrist" },
-        { "target": "head", "cmd": "say",   "text": "hallo" },
+        { "target": "_",  "cmd": "delay",  "seconds": 5 },
+        { "target": "_tool", "cmd": "move",  "position": "finger_center", "speed": 100 },
+        { "target": "_arm",  "cmd": "move",  "position": "up",            "speed": 300},
+        { "target": "_arm",  "cmd": "relax", "joint": "wrist" },
+        { "target": "_",  "cmd": "delay",  "seconds": 5 },
+        { "target": "_head", "cmd": "say",   "text": "hallo" },
         { "target": "arm",  "cmd": "relax", "joint": "all" }
     ]
 }

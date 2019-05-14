@@ -2,6 +2,7 @@ import sys
 import getopt
 import json
 import operator
+import time
 
 from pathlib import Path
 from time import sleep
@@ -29,13 +30,18 @@ def handle_relax(robot, cmd):
 def handle_say(cmd):
     print("say")
 
+def handle_delay(cmd):
+    print(f"delay {cmd['seconds']}")
+    time.sleep(cmd['seconds'])
+
 CMD_HANDLER_MAP = {
         'move': { 
             'arm': handle_move_arm,
             'tool': handle_move_tool
         },
         'relax': handle_relax,
-        'say': handle_say
+        'say': handle_say,
+        'delay': handle_delay
     }
 
 def main(argv):
@@ -87,7 +93,9 @@ def main(argv):
                 CMD_HANDLER_MAP[cmd](robot, _)
             elif cmd == 'say':
                 CMD_HANDLER_MAP[cmd](_)
-                
+            elif cmd == 'delay':
+                CMD_HANDLER_MAP[cmd](_)
+                 
 
 
 if __name__ == "__main__":

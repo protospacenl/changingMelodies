@@ -23,12 +23,15 @@ int handle_command(command_t *msg, PatrickController *controller)
         }
     } else if (msg->cmd == CMD_SERVO_GOAL_POSITION) {
         cmd_position_t * cmd = (cmd_position_t*)&msg->params;
+        __patrick.setServoPosition(cmd->id, cmd->position);
         Serial.write(cmd->id);
         Serial.print(cmd->position);
     } else if (msg->cmd == CMD_SERVO_MOVING_SPEED) {
         cmd_speed_t * cmd = (cmd_speed_t*)&msg->params;
+        __patrick.setServoSpeed(cmd->id, cmd->speed);
     } else if (msg->cmd == CMD_SERVO_TORQUE_LIMIT) {
         cmd_torque_t * cmd = (cmd_torque_t*)&msg->params;
+        __patrick.setServoTorque(cmd->id, cmd->torque);
     } else {
         ;
     }
