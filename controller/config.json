@@ -18,8 +18,8 @@
         },
         
         "sensors": [
-            { "name": "touch", "gpio": "GPIO6", "pull_up": true, "bounce_time": 0.1 },
-            { "name": "reset", "gpio": "GPIO13", "pull_up": true, "bounce_time": 0.1 },
+            { "name": "touch", "gpio": "GPIO6", "pull_up": true, "bounce_time": 1.0 },
+            { "name": "reset", "gpio": "GPIO13", "pull_up": true, "bounce_time": 1.0 },
             { "name": "sit",   "gpio": "GPIO19", "pull_up": false },
             { "name": "other", "gpio": "GPIO26", "pull_up": false }
         ]

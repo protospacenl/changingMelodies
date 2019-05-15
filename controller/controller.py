@@ -42,8 +42,9 @@ def handle_wait_trigger(robot, cmd):
     timeout = cmd['timeout'] if 'timeout' in cmd else None
     s = robot.get_sensor(cmd['target'])
     print(f"Waiting for trigger from {s!r}")
-    was_pressed = s.wait_for_press(timeout=timeout)
-    print(f"Was pressed: {was_pressed}")
+    t = s.wait_for_press(timeout=timeout)
+    print(f"Triggered: {t!r}, Value: {s.value}")
+    return t
 
 
 CMD_HANDLER_MAP = {
@@ -115,9 +116,19 @@ def main(argv):
                 elif cmd == 'delay':
                     CMD_HANDLER_MAP[cmd](_)
                 elif cmd == 'wait_for_trigger':
-                    CMD_HANDLER_MAP[cmd](robot, _)
-                    if 'action' in cmd:
+                    triggered = CMD_HANDLER_MAP[cmd](robot, _)
+                    if triggered:
+                        print(f"Triggered")
+                        if 'on_trigger' in _:
+                            if _['on_trigger'] == 'restart':
+                                break
+                    else:
+                        print(f"Timed out")
+                        if 'on_timeout' in _:
+                            if _['on_timeout'] == 'restart':
+                                break
 
+                
                       
 
 

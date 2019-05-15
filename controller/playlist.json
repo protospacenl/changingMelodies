@@ -16,10 +16,11 @@
     },
 
     "playlist": [
-        { "target": "touch", "cmd": "wait_for_trigger", "timeout": 10, "#": "Wait for trigger"},
+        { "target": "touch", "cmd": "wait_for_trigger", "timeout": 10, "on_timeout": "restart", "#": "Wait for trigger"},
         { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 300 },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
         { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 100 },
+        { "target": "touch", "cmd": "wait_for_trigger", "timeout": 60, "on_timeout": "restart", "#": "Wait for trigger"},
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
         { "target": "arm",  "cmd": "relax",  "joint": "all" },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },

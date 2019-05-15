@@ -22,7 +22,7 @@ class Robot():
             bounce_time = s['bounce_time'] if 'bounce_time' in s else None
             active_state= s['active_state'] if 'active_state' in s else None
             gpio = Button(s['gpio'], pull_up=pull_up, bounce_time=bounce_time, active_state=active_state)
-            print(f"Added GPIO {s['name']}: {gpio!r}")
+            print(f"Added GPIO {s['name']}: {gpio!r}, bounce_time: {gpio.pin.bounce}")
             self.__sensors[s['name']] = gpio
 
     def get_sensor(self, name):
