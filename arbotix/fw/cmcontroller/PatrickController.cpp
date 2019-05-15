@@ -31,6 +31,7 @@ PatrickController::PatrickController(long baud)
 int PatrickController::addServo(uint8_t id, uint8_t type)
 {
     int i;
+    uint16_t position;
 
     if (nservos >= MAX_SERVOS)
         return -1;
@@ -42,11 +43,88 @@ int PatrickController::addServo(uint8_t id, uint8_t type)
 
     servos[nservos].id = id;
     servos[nservos].type = type;
+    servos[nservos].running = 0;
 
     dxlLEDOn(id);
-    dxlTorqueOn(id);
+    delay(100);
+    dxlLEDOff(id);
     
     nservos++;
 
     return nservos;
+}
+
+servo_t * PatrickController::getServo(uint8_t id)
+{
+    for (int i=0; i<nservos; i++) {
+        if (servos[i].id == id) {
+            return &servos[i];
+        }
+    }
+    return NULL;
+}
+
+void PatrickController::updateServos(void)
+{
+    int s;
+
+    for (s=0; s<nservos; s++) {
+        servo_t *servo = &servos[s]; 
+
+        if (millis() - servo->last_frame < PATRICK_FRAME_DELAY)
+            continue;
+
+        servo->last_frame = millis();
+
+        if (servo->running) {
+            int diff = servo->next_position - servo->current_position_set;
+            if (diff == 0) {
+                servo->running = 0;
+            } else {
+                if (diff > 0) {
+                    if (diff < servo->speed) {
+                        servo->current_position_set = servo->next_position;
+                        servo->running = 0;
+                    } else {
+                        servo->current_position_set += servo->speed;
+                    }
+                } else {
+                    if ((-diff) < servo->speed) {
+                        servo->current_position_set = servo->next_position;
+                        servo->running = 0;
+                    } else {
+                        servo->current_position_set -= servo->speed;
+                    }
+                }
+            }
+
+            dxlSetGoalPosition(servo->id, (servo->current_position_set >> POSITION_SHIFT));
+        } else {
+        }
+    }
+}
+
+void PatrickController::initNextPosition(uint8_t id, int position) 
+{
+    servo_t *servo;
+    int frames = 0;
+
+    servo = getServo(id);
+    if (servo == NULL)
+        return;
+    
+    int curpos = dxlGetPosition(id);
+
+    frames = (servo->position_ms / PATRICK_FRAME_DELAY) + 1;
+    servo->current_position_set = curpos << POSITION_SHIFT;
+    servo->next_position = position << POSITION_SHIFT;
+    servo->last_frame = millis();
+
+    if(servo->next_position > servo->current_position_set) {
+        servo->speed = (servo->next_position - servo->current_position_set) / frames + 1;
+    }else{
+        servo->speed = (servo->current_position_set - servo->next_position) / frames + 1;
+    }
+
+    servo->running = 1;
 }

@@ -23,6 +23,7 @@
 #include "ax12.h"
 
 #define PATRICK_FRAME_DELAY 33
+#define POSITION_SHIFT      3
 
 #define MAX_SERVOS          3
 #define SERVO_TYPE_AX       0
@@ -36,11 +37,18 @@
 typedef struct {
     uint8_t id;
     uint8_t type;
-    uint16_t new_position;
-    uint16_t speed;
-    uint16_t torque;
-    uint16_t temperature;
-    uint16_t state;
+    int current_position;
+    int current_position_set;
+    int next_position;
+    int temperature;
+    int torque_limit;
+    int torque_enabled;
+    int speed;
+    int position_ms;
+    int state;
+    int running;
+    unsigned long last_frame;
+
 } servo_t; 
 
 /** Patrick Controller Class for mega324p/644p clients. **/
@@ -51,31 +59,37 @@ class PatrickController
     PatrickController(long baud);               // baud usually 1000000
 
     int addServo(uint8_t id, uint8_t type);
+    servo_t * getServo(uint8_t id);
+    void updateServos(void);
+    void initNextPosition(uint8_t id, int position);
 
-    void setServoSpeed(uint8_t id, uint16_t speed) {
+    void setServoSpeed(uint8_t id, int speed) {
+        servo_t *servo = getServo(id);
+        if (servo == NULL)
+            return;
+        servo->position_ms = speed;
+
         dxlSetGoalSpeed(id, speed);
-        delay(PATRICK_FRAME_DELAY);
+        delay(3);
     };
 
     void setServoTorque(uint8_t id, uint16_t torque) {
-        dxlSetRunningTorqueLimit(id, torque);
-        delay(PATRICK_FRAME_DELAY);
+        if (torque == 0) {
+            dxlTorqueOff(id);
+        } else {
+            dxlTorqueOn(id);
+            dxlSetRunningTorqueLimit(id, torque);
+        }
+        delay(3);
     };
 
-    void setServoPosition(uint8_t id, uint16_t position) {
+    void setServoPosition(uint8_t id, uint16_t position, uint16_t speed=100, uint16_t torque=1023) {
+        setServoTorque(id, torque);
+        setServoSpeed(id, speed);
         dxlSetGoalPosition(id, position);
         delay(PATRICK_FRAME_DELAY);
     };
 
-    void setServoPosition(uint8_t id, uint16_t position, uint16_t speed) {
-        setServoSpeed(id, speed);
-        setServoPosition(id, position);
-    };
-
-    void setServoPosition(uint8_t id, uint16_t position, uint16_t speed, uint16_t torque) {
-        setServoTorque(id, torque);
-        setServoPosition(id, position, speed);
-    };
 
   private:  
     uint8_t nservos;

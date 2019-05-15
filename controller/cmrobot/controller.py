@@ -27,6 +27,8 @@ class Controller(metaclass=Singleton):
     def wait_for_ack(self):
         while True:
             ack = self.__serial.read(1)
+            if ack == b'':
+                continue
             print(f"got ack: {ack!r}")
             if ack == self.CMD_ACK:
                 return True

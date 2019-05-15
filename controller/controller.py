@@ -14,7 +14,9 @@ CONFIG_PATH = './config.json'
 def handle_move_arm(robot, positions, cmd):
     if cmd['position'] in positions:
         p = positions[cmd['position']]['joints']
-        robot.move_joints_to(p)
+        speed = cmd['speed'] if 'speed' in cmd else 0
+        torque = cmd['torque'] if 'torque' in cmd else 0
+        robot.move_joints_to(p, speed=speed, torque=torque)
 
 def handle_move_tool(robot, positions, cmd):
     if cmd['position'] in positions:

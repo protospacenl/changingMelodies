@@ -59,6 +59,8 @@
 
     "positions": {
         "arm": {
+            "wrist_up": { "joints": [ { "name": "wrist",        "pos": 700} ] },
+            "wrist_down": { "joints": [ { "name": "wrist",        "pos": 512} ] },
             "rest": { "joints": [ { "name": "shoulder_rot", "pos": 512},
                                   { "name": "shoulder_ud",  "pos": 512},
                                   { "name": "wrist",        "pos": 512} ] },
@@ -72,13 +74,19 @@
     },
 
     "playlist": [
-        { "target": "arm",  "cmd": "move",  "position": "rest",          "speed": 100 },
-        { "target": "_",  "cmd": "delay",  "seconds": 5 },
-        { "target": "_tool", "cmd": "move",  "position": "finger_center", "speed": 100 },
-        { "target": "_arm",  "cmd": "move",  "position": "up",            "speed": 300},
-        { "target": "_arm",  "cmd": "relax", "joint": "wrist" },
-        { "target": "_",  "cmd": "delay",  "seconds": 5 },
-        { "target": "_head", "cmd": "say",   "text": "hallo" },
-        { "target": "arm",  "cmd": "relax", "joint": "all" }
+        { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 20 },
+        { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 100 },
+        { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "arm",  "cmd": "relax",  "joint": "all" },
+        { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "arm",  "cmd": "move",   "position": "rest", "speed": 70 },
+        { "target": "_",    "cmd": "delay",  "seconds": 2 },
+        { "target": "arm",  "cmd": "relax",  "joint": "wrist" },
+        { "target": "_tool","cmd": "move",   "position": "finger_center", "speed": 100 },
+        { "target": "_arm", "cmd": "move",   "position": "up", "speed": 300 },
+        { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "_head","cmd": "say",    "text": "hallo" },
+        { "target": "arm",  "cmd": "relax",  "joint": "all" }
     ]
 }
