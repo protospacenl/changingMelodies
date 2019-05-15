@@ -1,16 +1,50 @@
 #include "Stepper.h"
 
-Stepper::Stepper(uint8_t enable_pin, uint8_t step_pin, uint8_t dir_pin, uint8_t endstop_pin)
+void Stepper::step() 
 {
-    this.enable_pin = enable_pin;
-    this.step_pin = step_pin;
-    this.dir_pin = dir_pin;
-    this.endstop_pin = endstop_pin;
+    enable(true);
 
-    pinMode(this.enable_pin, OUTPUT);
-    pinMode(this.step_pin, OUTPUT);
-    pinMode(this.dir_pin, OUTPUT);
-    pinmode(this.endstop_pin, INPUT);
+    digitalWrite(this->step_pin, HIGH);
+    delayMicroseconds(50);
+    digitalWrite(this->step_pin, LOW);
+    
+    if (this->current_direction == FORWARD) {
+        this->current_steps++;
+    } else {
+        this->current_steps--;
+    }
+}
 
-    this.step = 0;
+
+int Stepper::home(int dir)
+{
+    enable(true);
+
+    resetSteps();
+
+    direction(dir);
+    while (digitalRead(endstop_pin) == ENDSTOP_INACTIVE) {
+        step();
+        delayMicroseconds(300);
+
+        if (getSteps() >= getMaxSteps()) {
+           enable(false);
+            return -1;
+        }
+    }
+
+    direction(!dir);
+    while (digitalRead(endstop_pin) == ENDSTOP_ACTIVE) {
+        step();
+        delay(3);
+        if (getSteps() >= getMaxSteps()) {
+            enable(false);
+            return -1;
+        }
+    }
+
+    enable(false);
+    resetSteps();
+
+    return 0;
 }

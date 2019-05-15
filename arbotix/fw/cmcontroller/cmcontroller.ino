@@ -1,7 +1,18 @@
 #include "ax12.h"
 #include "PatrickController.h"
-//#include <BioloidController.h>
+#include "Stepper.h"
 #include "command.h"
+
+#define TOOL_X_EN_PIN       6
+#define TOOL_Z_EN_PIN       7
+#define TOOL_X_STEP_PIN     4
+#define TOOL_Z_STEP_PIN     5
+#define TOOL_X_DIR_PIN      3
+#define TOOL_Z_DIR_PIN      2
+#define TOOL_X_ENDSTOP_PIN  16
+#define TOOL_Z_ENDSTOP_PIN  17
+
+#define MICROSTEP           8
 
 #define SERIAL_TIMEOUT      5000
 
@@ -14,7 +25,8 @@ int current_state = 0;
 
 command_t __command;
 PatrickController __patrick = PatrickController(1000000); 
-
+Stepper __spindle_x = Stepper(TOOL_X_EN_PIN, TOOL_X_STEP_PIN, TOOL_X_DIR_PIN, TOOL_X_ENDSTOP_PIN, MICROSTEP);
+Stepper __spindle_z = Stepper(TOOL_Z_EN_PIN, TOOL_Z_STEP_PIN, TOOL_Z_DIR_PIN, TOOL_Z_ENDSTOP_PIN, MICROSTEP);
 
 int handle_command(command_t *msg, PatrickController *controller)
 {
@@ -59,6 +71,23 @@ void setup(void)
     Serial.setTimeout(SERIAL_TIMEOUT);
     delay(500);
     /* send ack */
+
+    Serial.println("homing X\n");
+    if ( __spindle_x.home(Stepper::FORWARD) < 0) {
+       Serial.println("Error homing X");
+       Serial.write(CMD_RESP_ERR);
+       for (;;) ;
+    }
+    Serial.println("X homed\n");
+    
+    Serial.println("homing Z\n");
+    if ( __spindle_z.home(Stepper::FORWARD) < 0) {
+       Serial.println("Error homing Y");
+       Serial.write(CMD_RESP_ERR);
+       for (;;) ;
+    }
+    Serial.println("Z homed\n");
+
     Serial.write(CMD_RESP_ACK);
 
 }
