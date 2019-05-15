@@ -42,7 +42,8 @@ def handle_wait_trigger(robot, cmd):
     timeout = cmd['timeout'] if 'timeout' in cmd else None
     s = robot.get_sensor(cmd['target'])
     print(f"Waiting for trigger from {s!r}")
-    s.wait_for_press(timeout=timeout)
+    was_pressed = s.wait_for_press(timeout=timeout)
+    print(f"Was pressed: {was_pressed}")
 
 
 CMD_HANDLER_MAP = {
@@ -97,24 +98,27 @@ def main(argv):
 
     print(f"Created robot with joints {robot.joints}")
 
-    for _ in playlist:
-        cmd = _['cmd']
-        target = _['target'] if 'target' in _ else None
-        if cmd in CMD_HANDLER_MAP.keys():
-            if cmd == 'move':
-                if target == 'arm':
-                    CMD_HANDLER_MAP[cmd][target](robot, arm_positions, _)
-                elif target == 'tool':
-                    CMD_HANDLER_MAP[cmd][target](robot, tool_positions, _)
-            elif cmd == 'relax':
-                CMD_HANDLER_MAP[cmd](robot, _)
-            elif cmd == 'say':
-                CMD_HANDLER_MAP[cmd](_)
-            elif cmd == 'delay':
-                CMD_HANDLER_MAP[cmd](_)
-            elif cmd == 'wait_for_trigger':
-                CMD_HANDLER_MAP[cmd](robot, _)
-                  
+    while True:
+        for _ in playlist:
+            cmd = _['cmd']
+            target = _['target'] if 'target' in _ else None
+            if cmd in CMD_HANDLER_MAP.keys():
+                if cmd == 'move':
+                    if target == 'arm':
+                        CMD_HANDLER_MAP[cmd][target](robot, arm_positions, _)
+                    elif target == 'tool':
+                        CMD_HANDLER_MAP[cmd][target](robot, tool_positions, _)
+                elif cmd == 'relax':
+                    CMD_HANDLER_MAP[cmd](robot, _)
+                elif cmd == 'say':
+                    CMD_HANDLER_MAP[cmd](_)
+                elif cmd == 'delay':
+                    CMD_HANDLER_MAP[cmd](_)
+                elif cmd == 'wait_for_trigger':
+                    CMD_HANDLER_MAP[cmd](robot, _)
+                    if 'action' in cmd:
+
+                      
 
 
 if __name__ == "__main__":

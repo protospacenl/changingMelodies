@@ -16,7 +16,7 @@
     },
 
     "playlist": [
-        { "target": "touch", "cmd": "wait_for_trigger", "timeout": 60, "#": "Wait for trigger"},
+        { "target": "touch", "cmd": "wait_for_trigger", "timeout": 10, "#": "Wait for trigger"},
         { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 300 },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
         { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 100 },
