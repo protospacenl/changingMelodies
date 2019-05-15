@@ -38,10 +38,11 @@ def handle_delay(cmd):
     print(f"delay {cmd['seconds']}")
     time.sleep(cmd['seconds'])
 
-def handle_wait_sensor(robot, cmd):
+def handle_wait_trigger(robot, cmd):
     timeout = cmd['timeout'] if 'timeout' in cmd else None
     s = robot.get_sensor(cmd['target'])
-    #s.wait_for_press(timeout=timeout)
+    print(f"Waiting for trigger from {s!r}")
+    s.wait_for_press(timeout=timeout)
 
 
 CMD_HANDLER_MAP = {
@@ -52,7 +53,7 @@ CMD_HANDLER_MAP = {
         'relax': handle_relax,
         'say': handle_say,
         'delay': handle_delay,
-        'wait_for_sensor': handle_wait_sensor
+        'wait_for_trigger': handle_wait_trigger
     }
 
 def main(argv):
@@ -111,7 +112,7 @@ def main(argv):
                 CMD_HANDLER_MAP[cmd](_)
             elif cmd == 'delay':
                 CMD_HANDLER_MAP[cmd](_)
-            elif cmd == 'wait_for_sensor':
+            elif cmd == 'wait_for_trigger':
                 CMD_HANDLER_MAP[cmd](robot, _)
                   
 
