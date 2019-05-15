@@ -73,7 +73,7 @@ class Controller(metaclass=Singleton):
 
     def write_tool_pos(self, x, z, speed):
         self.write(struct.pack('H', self.CMD_HEADER))
-        self.write(bytes([self.CMD_TOOL_POS, 6]))
+        self.write(bytes([self.CMD_TOOL_POSITION, 6]))
         self.write(struct.pack('H', x))
         self.write(struct.pack('H', z))
         self.write(struct.pack('H', speed), wait=True)

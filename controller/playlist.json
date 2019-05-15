@@ -11,7 +11,9 @@
                                   { "name": "wrist",        "pos": 123} ] }
         },
         "tool": {
-            "center": { "x": 30, "z": 30 }
+            "center": { "x": 200, "z": 40 },
+            "down": { "x": 200, "z": 20 },
+            "up": { "x": 50, "z": 40 },
             "home": { "x": 0, "z": 0 }
         }
     },
@@ -21,23 +23,26 @@
         { "target": "head", "cmd": "send", "data": "a" },
         { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 300 },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "tool","cmd": "move",   "position": "center", "speed": 1 },
         { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 100 },
         { "target": "touch", "cmd": "_wait_for_trigger", "timeout": 60, "on_timeout": "restart", "#": "Wait for trigger"},
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
         { "target": "arm",  "cmd": "relax",  "joint": "all" },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
-        { "target": "tool","cmd": "move",   "position": "center", "speed": 20 },
+        { "target": "tool","cmd": "move",   "position": "down", "speed": 1 },
         { "target": "arm",  "cmd": "move",   "position": "rest", "speed": 70 },
         { "target": "_",    "cmd": "delay",  "seconds": 2 },
         { "target": "arm",  "cmd": "relax",  "joint": "wrist" },
         { "target": "_arm", "cmd": "move",   "position": "up", "speed": 400 },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "tool","cmd": "move",   "position": "up", "speed": 1 },
         { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 800, "wait": 0.2 },
         { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 800 , "wait": 0.2},
         { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 800 , "wait": 0.2},
         { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 800 , "wait": 0.2},
-        { "target": "tool","cmd": "move",   "position": "home", "speed": 10 },
+        { "target": "tool","cmd": "move",   "position": "home", "speed": 30 },
         { "target": "_head","cmd": "say",    "text": "hallo" },
-        { "target": "arm",  "cmd": "relax",  "joint": "all" }
+        { "target": "arm",  "cmd": "relax",  "joint": "all" },
+        { "target": "_",    "cmd": "delay",  "seconds": 10 }
     ]
 }

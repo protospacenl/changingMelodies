@@ -104,7 +104,8 @@ def main(argv):
 
     print(f"Created robot with joints {robot.joints}")
 
-    head = serial.Serial(head_config['port'], head_config['baudrate'], timeout=head['timeout'])
+    #head = serial.Serial(head_config['port'], head_config['baudrate'], timeout=head['timeout'])
+    head = None
     print(f"Opened connection to the head")
 
     while True:
@@ -126,7 +127,8 @@ def main(argv):
                 elif cmd == 'send':
                     if cmd['target'] == 'head':
                         print(f"Sending data to head: {cmd['data'].encode()}")
-                        head.write(cmd['data'].encode())
+                        if head:
+                            head.write(cmd['data'].encode())
                 elif cmd == 'wait_for_trigger':
                     triggered = CMD_HANDLER_MAP[cmd](robot, _)
                     if triggered:
