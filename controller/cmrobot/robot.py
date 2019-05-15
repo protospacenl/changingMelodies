@@ -1,6 +1,6 @@
 import serial
 import time
-#from gpiozero import DigitalInputDevice
+from gpiozero import DigitalInputDevice
 
 from cmrobot.joint import JointAX, JointMX
 from cmrobot.controller import Controller
@@ -21,8 +21,8 @@ class Robot():
             pull_up = s['pull_up'] if 'pull_up' in s else None
             bounce_time = s['bounce_time'] if 'bounce_time' in s else None
             active_state= s['active_state'] if 'active_state' in s else None
-            #gpio = DigitalInputDevice(s['gpio'], pull_up=pull_up, bounce_time=bounce_time, active_state=active_state)
-            gpio = s
+            gpio = DigitalInputDevice(s['gpio'], pull_up=pull_up, bounce_time=bounce_time, active_state=active_state)
+            #gpio = s
             print(f"Added GPIO {s['name']}: {gpio!r}")
             self.__sensors[s['name']] = gpio
 

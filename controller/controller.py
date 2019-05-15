@@ -10,6 +10,7 @@ from time import sleep
 from cmrobot import Robot
 
 CONFIG_PATH = './config.json'
+PLAYLIST_PATH = './playlist.json'
 
 def handle_move_arm(robot, positions, cmd):
     if cmd['position'] in positions:
@@ -49,12 +50,14 @@ CMD_HANDLER_MAP = {
 
 def main(argv):
     config_path     = CONFIG_PATH
+    playlist_path   = PLAYLIST_PATH
     config          = None
+    playlist        = None
 
     try:
-        opts, args = getopt.getopt(argv[1:], "hc:", ["config="])
+        opts, args = getopt.getopt(argv[1:], "hc:p:", ["config=","playlist="])
     except getopt.GetoptError:
-        print('{} -c <config>'.format(sys.argv[0]))
+        print('{} -c <config> -p <playlist>'.format(sys.argv[0]))
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
@@ -62,9 +65,14 @@ def main(argv):
             sys.exit()
         elif opt in ("-c", "--config"):
             config_path = arg
+        elif opt in ("-p", "--playlist"):
+            playlist_path = arg
 
     with open(config_path, 'r') as f:
         config = json.load(f)
+
+    with open(playlist_path, 'r') as f:
+        playlist = json.load(f)
 
     robot_config = config['robot']
     head_config = config['head']
@@ -75,9 +83,9 @@ def main(argv):
     joints = config['joints']
     robot.add_joints(joints)
 
-    arm_positions = config['positions']['arm']
-    tool_positions = config['positions']['tool']
-    playlist = config['playlist']
+    arm_positions = playlist['positions']['arm']
+    tool_positions = playlist['positions']['tool']
+    playlist = playlist['playlist']
 
     print(f"Created robot with joints {robot.joints}")
 

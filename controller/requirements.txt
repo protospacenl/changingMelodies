@@ -1,2 +1,4 @@
 pyserial
+rpi.gpio
+spidev
 gpiozero
