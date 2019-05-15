@@ -1,12 +1,34 @@
 import serial
+import time
+#from gpiozero import DigitalInputDevice
 
 from cmrobot.joint import JointAX, JointMX
 from cmrobot.controller import Controller
 
 class Robot():
-    def __init__(self, controller=None):
+    def __init__(self, controller=None, sensors=None):
         self.__controller = Controller(**controller)
+        self.__sensors = {}
         self.__joints = {}
+
+        self.__init_sensors(sensors)
+
+    def __init_sensors(self, sensors):
+        if sensors == None:
+            return
+
+        for s in sensors:
+            pull_up = s['pull_up'] if 'pull_up' in s else None
+            bounce_time = s['bounce_time'] if 'bounce_time' in s else None
+            active_state= s['active_state'] if 'active_state' in s else None
+            #gpio = DigitalInputDevice(s['gpio'], pull_up=pull_up, bounce_time=bounce_time, active_state=active_state)
+            gpio = s
+            print(f"Added GPIO {s['name']}: {gpio!r}")
+            self.__sensors[s['name']] = gpio
+
+    def get_sensor(self, name):
+        if name in self.__sensors:
+            return self.__sensors[name]
 
     @property
     def joints(self):
@@ -45,7 +67,7 @@ class Robot():
         j = self.__joints[name]
         j.move_to(position, speed=speed, torque=torque)
     
-    def move_joints_to(self, positions, speed=0, torque=0):
+    def move_joints_to(self, positions, speed=0, torque=0, wait=0):
         for p in positions:
             _s = speed
             _t = torque
@@ -54,6 +76,9 @@ class Robot():
             if 'torque' in p:
                 _t = p['torque']
             self.move_joint_to(p['name'], p['pos'], speed=_s, torque=_t)
+
+        if wait > 0:
+            time.sleep(wait)
 
     def relax_joint(self, name):
         if not name in self.joints:

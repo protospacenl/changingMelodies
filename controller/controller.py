@@ -16,7 +16,8 @@ def handle_move_arm(robot, positions, cmd):
         p = positions[cmd['position']]['joints']
         speed = cmd['speed'] if 'speed' in cmd else 0
         torque = cmd['torque'] if 'torque' in cmd else 0
-        robot.move_joints_to(p, speed=speed, torque=torque)
+        wait = cmd['wait'] if 'wait' in cmd else 0
+        robot.move_joints_to(p, speed=speed, torque=torque, wait=wait)
 
 def handle_move_tool(robot, positions, cmd):
     if cmd['position'] in positions:
@@ -73,8 +74,6 @@ def main(argv):
 
     joints = config['joints']
     robot.add_joints(joints)
-
-    sensors = config['sensors']
 
     arm_positions = config['positions']['arm']
     tool_positions = config['positions']['tool']

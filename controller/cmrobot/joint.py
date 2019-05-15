@@ -41,8 +41,6 @@ class Joint():
         self.__controller.write_joint_torque(self.id, torque)
 
     def move_to(self, position, speed=0, torque=0):
-        if speed == 0:
-            speed = self.MAX_MOVING_SPEED
         if torque == 0:
             torque = self.MAX_TORQUE_LIMIT
 

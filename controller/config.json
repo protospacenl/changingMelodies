@@ -1,13 +1,7 @@
 {
     "version": 1.0,
  
-    "sensors": [
-        { "name": "touch", "gpio": "GPIO3", "bias": "NO", "trigger": "LOW" },
-        { "name": "reset", "gpio": "GPIO4", "bias": "UP", "trigger": "LOW" },
-        { "name": "sit", "  gpio": "GPIO5", "bias": "UP", "trigger": "LOW" },
-        { "name": "other", "gpio": "GPIO3", "bias": "UP", "trigger": "LOW" }
-    ],
-
+    
     "head": {
         "port": "/dev/ttyS0",
         "baudrate": 19200,
@@ -21,7 +15,15 @@
             "port": "/dev/ttyUSB0",
             "baudrate": 19200,
             "timeout": 1
-        }
+        },
+        
+        "sensors": [
+            { "name": "touch", "gpio": "GPIO6" },
+            { "name": "reset", "gpio": "GPIO13", "pull_up": true,   "bounce_time": 0.1 },
+            { "name": "sit", "  gpio": "GPIO19", "pull_up": false,  "active_state": true },
+            { "name": "other", "gpio": "GPIO26", "pull_up": false }
+        ]
+
     },
 
     "joints": [
@@ -74,7 +76,7 @@
     },
 
     "playlist": [
-        { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 20 },
+        { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 300 },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
         { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 100 },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
@@ -84,8 +86,12 @@
         { "target": "_",    "cmd": "delay",  "seconds": 2 },
         { "target": "arm",  "cmd": "relax",  "joint": "wrist" },
         { "target": "_tool","cmd": "move",   "position": "finger_center", "speed": 100 },
-        { "target": "_arm", "cmd": "move",   "position": "up", "speed": 300 },
+        { "target": "_arm", "cmd": "move",   "position": "up", "speed": 400 },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 800, "wait": 0.2 },
+        { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 800 , "wait": 0.2},
+        { "target": "arm",  "cmd": "move",   "position": "wrist_up", "speed": 800 , "wait": 0.2},
+        { "target": "arm",  "cmd": "move",   "position": "wrist_down", "speed": 800 , "wait": 0.2},
         { "target": "_head","cmd": "say",    "text": "hallo" },
         { "target": "arm",  "cmd": "relax",  "joint": "all" }
     ]

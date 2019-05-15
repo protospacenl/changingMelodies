@@ -70,7 +70,7 @@ class PatrickController
         servo->position_ms = speed;
 
         dxlSetGoalSpeed(id, speed);
-        delay(3);
+        delay(33);
     };
 
     void setServoTorque(uint8_t id, uint16_t torque) {
@@ -78,14 +78,13 @@ class PatrickController
             dxlTorqueOff(id);
         } else {
             dxlTorqueOn(id);
+            delay(3);
             dxlSetRunningTorqueLimit(id, torque);
         }
-        delay(3);
+        delay(33);
     };
 
-    void setServoPosition(uint8_t id, uint16_t position, uint16_t speed=100, uint16_t torque=1023) {
-        setServoTorque(id, torque);
-        setServoSpeed(id, speed);
+    void setServoPosition(uint8_t id, uint16_t position) {
         dxlSetGoalPosition(id, position);
         delay(PATRICK_FRAME_DELAY);
     };
