@@ -6,6 +6,7 @@ uint8_t CMD_HEADER[2] = {0xff, 0xff};
 #define CMD_RESP_ACK              0xff
 #define CMD_RESP_ERR              0xee
 #define CMD_ADD_SERVO             0x01
+#define CMD_TOOL_POSITION         0x02
 #define CMD_SERVO_GOAL_POSITION   0x1E
 #define CMD_SERVO_MOVING_SPEED    0x20
 #define CMD_SERVO_TORQUE_LIMIT    0x22
@@ -39,6 +40,13 @@ typedef struct __attribute__(( packed)) command_t {
         cmd_position_t goal_positon;
     } params;
 } command_t;
+
+typedef struct __attribute__(( packed)) cmd_tool_position_t {
+    uint16_t x;
+    uint16_t z;
+    uint16_t mms;
+} cmd_tool_position_t;
+
 
 
 #endif

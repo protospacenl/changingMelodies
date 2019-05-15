@@ -23,8 +23,11 @@ def handle_move_arm(robot, positions, cmd):
 
 def handle_move_tool(robot, positions, cmd):
     if cmd['position'] in positions:
+        speed = cmd['speed'] if 'speed' in cmd else 10
         p = positions[cmd['position']]
-        print(f"Movie tool to position: {p!r}") 
+        print(f"Movie tool to position: {p!r} with speed {speed}") 
+        robot.move_tool_to(p, speed) 
+
 
 def handle_relax(robot, cmd):
     if cmd['joint'] == 'all':

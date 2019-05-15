@@ -7,6 +7,7 @@ class Controller(metaclass=Singleton):
 
     CMD_HEADER                = 0xffff
     CMD_ADD_SERVO             = 0x01
+    CMD_TOOL_POSITION         = 0x02
     CMD_SERVO_GOAL_POSITION   = 0x1E
     CMD_SERVO_MOVING_SPEED    = 0x20
     CMD_SERVO_TORQUE_LIMIT    = 0x22
@@ -70,6 +71,12 @@ class Controller(metaclass=Singleton):
         self.write(bytes([self.CMD_SERVO_TORQUE_LIMIT, 3, id]))
         self.write(struct.pack('H', torque), wait=True)
 
+    def write_tool_pos(self, x, z, speed):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_TOOL_POS, 6]))
+        self.write(struct.pack('H', x))
+        self.write(struct.pack('H', z))
+        self.write(struct.pack('H', speed), wait=True)
 
 
 

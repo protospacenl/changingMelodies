@@ -3,10 +3,10 @@
 #include "Stepper.h"
 #include "command.h"
 
-#define TOOL_X_EN_PIN       6
-#define TOOL_Z_EN_PIN       7
-#define TOOL_X_STEP_PIN     4
-#define TOOL_Z_STEP_PIN     5
+#define TOOL_X_EN_PIN       7
+#define TOOL_Z_EN_PIN       6
+#define TOOL_X_STEP_PIN     5
+#define TOOL_Z_STEP_PIN     4
 #define TOOL_X_DIR_PIN      3
 #define TOOL_Z_DIR_PIN      2
 #define TOOL_X_ENDSTOP_PIN  16
@@ -40,6 +40,10 @@ int handle_command(command_t *msg, PatrickController *controller)
         } else {
             Serial.write(retval);
         }
+    } else if (msg->cmd == CMD_TOOL_POSITION) {
+        cmd_tool_position_t * cmd = (cmd_tool_position_t*)&msg->params;
+        __spindle_x.goTo(cmd->x, cmd->mms);
+        __spindle_z.goTo(cmd->z, cmd->mms);
     } else if (msg->cmd == CMD_SERVO_GOAL_POSITION) {
         cmd_position_t * cmd = (cmd_position_t*)&msg->params;
         dxlTorqueOn(cmd->id);
@@ -73,7 +77,7 @@ void setup(void)
     /* send ack */
 
     Serial.println("homing X\n");
-    if ( __spindle_x.home(Stepper::FORWARD) < 0) {
+    if ( __spindle_x.home(Stepper::BACKWARD) < 0) {
        Serial.println("Error homing X");
        Serial.write(CMD_RESP_ERR);
        for (;;) ;
@@ -81,7 +85,7 @@ void setup(void)
     Serial.println("X homed\n");
     
     Serial.println("homing Z\n");
-    if ( __spindle_z.home(Stepper::FORWARD) < 0) {
+    if ( __spindle_z.home(Stepper::BACKWARD) < 0) {
        Serial.println("Error homing Y");
        Serial.write(CMD_RESP_ERR);
        for (;;) ;
@@ -126,4 +130,6 @@ void loop(void)
     }
 
     __patrick.updateServos();
+    __spindle_x.update();
+    __spindle_z.update();
 }
