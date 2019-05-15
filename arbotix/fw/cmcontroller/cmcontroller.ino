@@ -12,7 +12,7 @@
 #define TOOL_X_ENDSTOP_PIN  16
 #define TOOL_Z_ENDSTOP_PIN  17
 
-#define MICROSTEP           8
+#define MICROSTEP           4
 
 #define SERIAL_TIMEOUT      5000
 
@@ -42,8 +42,13 @@ int handle_command(command_t *msg, PatrickController *controller)
         }
     } else if (msg->cmd == CMD_TOOL_POSITION) {
         cmd_tool_position_t * cmd = (cmd_tool_position_t*)&msg->params;
-        __spindle_x.goTo(cmd->x, cmd->mms);
-        __spindle_z.goTo(cmd->z, cmd->mms);
+        __spindle_z.goTo(cmd->z);
+        __spindle_x.goTo(cmd->x);
+        while (__spindle_z.isRunning() || __spindle_x.isRunning() ) { 
+            __spindle_z.update();
+            __spindle_x.update();
+            delayMicroseconds(200);
+        }
     } else if (msg->cmd == CMD_SERVO_GOAL_POSITION) {
         cmd_position_t * cmd = (cmd_position_t*)&msg->params;
         dxlTorqueOn(cmd->id);
@@ -52,11 +57,9 @@ int handle_command(command_t *msg, PatrickController *controller)
         //__patrick.initNextPosition(cmd->id, cmd->position);
     } else if (msg->cmd == CMD_SERVO_MOVING_SPEED) {
         cmd_speed_t * cmd = (cmd_speed_t*)&msg->params;
-        Serial.print(cmd->speed);
         __patrick.setServoSpeed(cmd->id, cmd->speed);
     } else if (msg->cmd == CMD_SERVO_TORQUE_LIMIT) {
         cmd_torque_t * cmd = (cmd_torque_t*)&msg->params;
-        Serial.print(cmd->torque);
         if (cmd->torque == 0) {
             dxlTorqueOff(cmd->id);
         } else {
@@ -130,6 +133,6 @@ void loop(void)
     }
 
     __patrick.updateServos();
-    __spindle_x.update();
-    __spindle_z.update();
+    //__spindle_x.update();
+    //__spindle_z.update();
 }

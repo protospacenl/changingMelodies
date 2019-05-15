@@ -40,7 +40,16 @@ int Stepper::home(int dir)
     travel_steps = 0;
     while (digitalRead(endstop_pin) == ENDSTOP_ACTIVE) {
         step();
-        delay(3);
+        delayMicroseconds(300);
+        if (travel_steps >= getMaxSteps()) {
+            enable(false);
+            return -1;
+        }
+    }
+
+    for (int i=5 * steps_per_mm; i>=0; i--) {
+        step();
+        delayMicroseconds(300);
         if (travel_steps >= getMaxSteps()) {
             enable(false);
             return -1;
@@ -54,9 +63,12 @@ int Stepper::home(int dir)
     return 0;
 }
 
-void Stepper::goTo(int mm, int mms)
+void Stepper::goTo(int mm)
 {
     goto_step = mm * steps_per_mm;
+
+    Serial.print("goto_step: ");
+    Serial.print(goto_step);
 
     if (goto_step == current_steps)
         return;
@@ -67,37 +79,47 @@ void Stepper::goTo(int mm, int mms)
         setDirection(BACKWARD);
     }
 
+    /*
     frame_delay = 1000000 / (steps_per_mm * mm);
     if (frame_delay < STEP_DELAY * 2) {
         frame_delay = STEP_DELAY;
     } else {
         frame_delay -= STEP_DELAY;
     }
+    */
 
     enable(true);
     running = 1;
-    last_frame = micros();
 }
 
-void Stepper::update()
+int Stepper::update()
 {
     if (running) {
-        if ((micros() - last_frame) > frame_delay) {
-            last_frame = micros();
+        if (digitalRead(endstop_pin) == ENDSTOP_ACTIVE) {
+            running = 0;
+            enable(false);
+        } else {
 
-            if (digitalRead(endstop_pin) == ENDSTOP_ACTIVE) {
+            step();
+
+            if (current_steps <= 0 || current_steps >= max_steps) {
                 running = 0;
                 enable(false);
             } else {
-
-                step();
-
-                if (current_steps <= 0 || current_steps >= max_steps || current_steps == goto_step) {
-
-                    running = 0;
-                    enable(false);
+                if (current_direction == FORWARD) {
+                    if (current_steps >= goto_step) {
+                        running = 0;
+                        enable(false);
+                    }
+                } else {
+                    if (current_steps <= goto_step) {
+                        running = 0;
+                        enable(false);
+                    }
                 }
             }
         }
+        return 1;
     }
+    return 0;
 }
