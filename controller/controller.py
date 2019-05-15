@@ -3,6 +3,7 @@ import getopt
 import json
 import operator
 import time
+import serial
 
 from pathlib import Path
 from time import sleep
@@ -63,6 +64,7 @@ def main(argv):
     playlist_path   = PLAYLIST_PATH
     config          = None
     playlist        = None
+    head            = None
 
     try:
         opts, args = getopt.getopt(argv[1:], "hc:p:", ["config=","playlist="])
@@ -99,6 +101,9 @@ def main(argv):
 
     print(f"Created robot with joints {robot.joints}")
 
+    head = serial.Serial(head_config['port'], head_config['baudrate'], timeout=head['timeout'])
+    print(f"Opened connection to the head")
+
     while True:
         for _ in playlist:
             cmd = _['cmd']
@@ -115,6 +120,10 @@ def main(argv):
                     CMD_HANDLER_MAP[cmd](_)
                 elif cmd == 'delay':
                     CMD_HANDLER_MAP[cmd](_)
+                elif cmd == 'send':
+                    if cmd['target'] == 'head':
+                        print(f"Sending data to head: {cmd['data'].encode()}")
+                        head.write(cmd['data'].encode())
                 elif cmd == 'wait_for_trigger':
                     triggered = CMD_HANDLER_MAP[cmd](robot, _)
                     if triggered:
