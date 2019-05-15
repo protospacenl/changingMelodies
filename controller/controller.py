@@ -38,6 +38,12 @@ def handle_delay(cmd):
     print(f"delay {cmd['seconds']}")
     time.sleep(cmd['seconds'])
 
+def handle_wait_sensor(robot, cmd):
+    timeout = cmd['timeout'] if 'timeout' in cmd else None
+    s = robot.get_sensor(cmd['target'])
+    #s.wait_for_press(timeout=timeout)
+
+
 CMD_HANDLER_MAP = {
         'move': { 
             'arm': handle_move_arm,
@@ -45,7 +51,8 @@ CMD_HANDLER_MAP = {
         },
         'relax': handle_relax,
         'say': handle_say,
-        'delay': handle_delay
+        'delay': handle_delay,
+        'wait_for_sensor': handle_wait_sensor
     }
 
 def main(argv):
@@ -91,7 +98,7 @@ def main(argv):
 
     for _ in playlist:
         cmd = _['cmd']
-        target = _['target']
+        target = _['target'] if 'target' in _ else None
         if cmd in CMD_HANDLER_MAP.keys():
             if cmd == 'move':
                 if target == 'arm':
@@ -104,7 +111,9 @@ def main(argv):
                 CMD_HANDLER_MAP[cmd](_)
             elif cmd == 'delay':
                 CMD_HANDLER_MAP[cmd](_)
-                 
+            elif cmd == 'wait_for_sensor':
+                CMD_HANDLER_MAP[cmd](robot, _)
+                  
 
 
 if __name__ == "__main__":

@@ -33,6 +33,15 @@
 #define AX_STEPSIZE_RECIP  8.982456f
 #define AX_DEGR_PER_STEP   0.29f
 
+#define TOOL_X_EN_PIN       D6
+#define TOOL_Z_EN_PIN       D7
+#define TOOL_X_STEP_PIN     D4
+#define TOOL_Z_STEP_PIN     D5
+#define TOOL_X_DIR_PIN      D3
+#define TOOL_Z_DIR_PIN      D2
+#define TOOL_X_ENDSTOP_PIN  D1
+#define TOOL_Z_ENDSTOP_PIN  D0
+
 /** a structure to hold transitions **/
 typedef struct {
     uint8_t id;
@@ -48,7 +57,6 @@ typedef struct {
     int state;
     int running;
     unsigned long last_frame;
-
 } servo_t; 
 
 /** Patrick Controller Class for mega324p/644p clients. **/
