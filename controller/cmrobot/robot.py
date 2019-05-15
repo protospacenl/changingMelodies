@@ -1,10 +1,6 @@
 import serial
 import time
-<<<<<<< Updated upstream
-from gpiozero import DigitalInputDevice
-=======
-#from gpiozero import Button
->>>>>>> Stashed changes
+from gpiozero import Button
 
 from cmrobot.joint import JointAX, JointMX
 from cmrobot.controller import Controller
