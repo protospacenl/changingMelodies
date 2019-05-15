@@ -3,16 +3,14 @@
  
     
     "head": {
-        "port": "/dev/ttyS0",
-        "baudrate": 19200,
-        "rts_gpio": "GPIO2",
-        "rts_delay": 0.005,
+        "port": "/dev/cm_head",
+        "baudrate": 9600,
         "timeout": 1
     },
 
     "robot": {
         "controller": {
-            "port": "/dev/ttyUSB0",
+            "port": "/dev/cm_controller",
             "baudrate": 19200,
             "timeout": 1
         },
