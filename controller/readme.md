@@ -31,30 +31,36 @@ python3 ./controller.py -m
 
 
 # Playlist
+Let op: alle is __case sensitive__!!
 
 ## Posities
 Commentaar is toe te voegen door een onbekende tag te gebruiken bijv: `"#": "Dit is commentaar"`
 
-positie shoulder_rot en wrist van `0-1023`
 
-positie shoulder_ud van `0-4095`
+* `__naam__` is de naam van de positie
+* `__positie__` is de numerice positie:
+  * positie shoulder_rot en wrist van `0-1023`
+  * positie shoulder_ud van `0-4095`
+
 
 ```json
     "positions": {
         "arm": {
-            "__naam__": { "joints": [ { "name": "wrist", "pos": "__positie__" } ], "#": "Positie met 1 gewricht" },
-            "__naam__": { "joints": [ { "name": "shoulder_rot", "pos": 512},
-                                      { "name": "shoulder_ud",  "pos": 512},
-                                      { "name": "wrist",        "pos": 512} ], "#": "Positie met 3 gewrichten" }
+            __naam__: { "joints": [ { "name": "wrist", "pos": __positie__ } ], "#": "Positie met 1 gewricht" },
+            __naam__: { "joints": [ { "name": "shoulder_rot", "pos": __positie__ },
+                                      { "name": "shoulder_ud",  "pos": __positie__ },
+                                      { "name": "wrist",        "pos": __positie__ } ], "#": "Positie met 3 gewrichten" }
         },
 
         "tool": {
-            "__naam__": { "x": __positie__, "z": __positie__, "#": "Tool positie heeft altijd een x en z in millimeters" }
+            __naam__: { "x": __positie__, "z": __positie__, "#": "Tool positie heeft altijd een x en z in millimeters" }
         }
     },
 ```
 
 ## Playlist
+De __position__ velden in de move commando's verwijzen naar de posities gemaakt in de __positions__ entries voor arm en tool.
+
 ```json
  "playlist": [
         { "target": "touch", "cmd": "_wait_for_trigger", "timeout": 10, "on_timeout": "restart", "#": "wacht op trigger en begin by begin playlist bij een timeout en ga verder bij trigger"},
