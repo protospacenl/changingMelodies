@@ -40,6 +40,15 @@ int handle_command(command_t *msg, PatrickController *controller)
         } else {
             Serial.write(retval);
         }
+    } else if (msg->cmd == CMD_MONITOR) {
+        int pos1 = dxlGetPosition(1); 
+        int pos2 = dxlGetPosition(2); 
+        int pos3 = dxlGetPosition(3); 
+        Serial.print(pos1);
+        Serial.print(", ");
+        Serial.print(pos2);
+        Serial.print(", ");
+        Serial.println(pos3);
     } else if (msg->cmd == CMD_TOOL_POSITION) {
         cmd_tool_position_t * cmd = (cmd_tool_position_t*)&msg->params;
         __spindle_z.goTo(cmd->z);
