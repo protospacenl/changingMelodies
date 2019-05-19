@@ -7,6 +7,7 @@ import serial
 
 from pathlib import Path
 from time import sleep
+from pygame import mixer
 
 from cmrobot import Robot
 
@@ -35,10 +36,15 @@ def handle_relax(robot, cmd):
     else:
         robot.relax_joint(cmd['joint'])
 
-def handle_say(cmd):
-    print("say")
+def handle_say(robot, cmd):
+    path = Path(cmd['path'] if 'path' in cmd else None
+    if not path or not path.exists():
+        return
+    print(f"say {path}")
+    mixer.music.load(path.as_posix())
+    mixer.music.play(1)
 
-def handle_delay(cmd):
+def handle_delay(robot, cmd):
     print(f"delay {cmd['seconds']}")
     time.sleep(cmd['seconds'])
 
@@ -89,6 +95,8 @@ def main(argv):
     with open(playlist_path, 'r') as f:
         playlist = json.load(f)
 
+    mixer.init()
+
     robot_config = config['robot']
     head_config = config['head']
 
@@ -118,13 +126,7 @@ def main(argv):
                         CMD_HANDLER_MAP[cmd][target](robot, arm_positions, _)
                     elif target == 'tool':
                         CMD_HANDLER_MAP[cmd][target](robot, tool_positions, _)
-                elif cmd == 'relax':
-                    CMD_HANDLER_MAP[cmd](robot, _)
-                elif cmd == 'say':
-                    CMD_HANDLER_MAP[cmd](_)
-                elif cmd == 'delay':
-                    CMD_HANDLER_MAP[cmd](_)
-                elif cmd == 'send':
+                    elif cmd == 'send':
                     if cmd['target'] == 'head':
                         print(f"Sending data to head: {cmd['data'].encode()}")
                         if head:
@@ -141,9 +143,9 @@ def main(argv):
                         if 'on_timeout' in _:
                             if _['on_timeout'] == 'restart':
                                 break
+                else:
+                    CMD_HANDLER_MAP[cmd](robot, _)
 
-                
-                      
 
 
 if __name__ == "__main__":

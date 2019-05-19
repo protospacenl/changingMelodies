@@ -2,3 +2,4 @@ pyserial
 rpi.gpio
 spidev
 gpiozero
+pygame
