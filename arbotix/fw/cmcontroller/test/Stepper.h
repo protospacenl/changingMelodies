@@ -1,7 +1,14 @@
-#include <Arduino.h>
 
 #ifndef __STEPPER_H__
 #define __STEPPER_H__
+
+#include <stdint.h>
+
+#define LOW 0
+#define HIGH 1
+
+#define  digitalWrite(__x, __y) ;
+#define  digitalRead(__x) 1
 
 class Stepper {
     public:
@@ -16,10 +23,12 @@ class Stepper {
             this->dir_pin = dir_pin;
             this->endstop_pin = endstop_pin;
 
+            /*
             pinMode(this->enable_pin, OUTPUT);
             pinMode(this->step_pin, OUTPUT);
             pinMode(this->dir_pin, OUTPUT);
             pinMode(this->endstop_pin, INPUT);
+            */
 
             this->current_steps = 0;
             this->current_direction = FORWARD;
@@ -41,19 +50,20 @@ class Stepper {
         };
 
         void enable(bool enable) {
-            if (enable)
+            if (enable) {
                 digitalWrite(this->enable_pin, HIGH);
-            else
+            } else {
                 digitalWrite(this->enable_pin, LOW);
+            }
         };
 
-        int home(int dir, int mm);
+        int home(int dir);
 
         void resetSteps() { current_steps = 0; };
-        unsigned long getSteps() { return current_steps; };
-        unsigned long getMaxSteps() { return max_steps; };
+        int16_t getSteps() { return current_steps; };
+        int16_t getMaxSteps() { return max_steps; };
 
-        void goTo(int pos);
+        void goTo(uint16_t mm);
         void step();
         void step(int dir) {
             setDirection(dir);
@@ -63,9 +73,9 @@ class Stepper {
         int update();
 
     private:
-        unsigned long current_steps;
-        unsigned long goto_step;
-        unsigned long max_steps;
+        int16_t current_steps;
+        int16_t goto_step;
+        int16_t max_steps;
         uint8_t current_direction;
         int microstep;
         int steps_per_mm;

@@ -1,6 +1,10 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "Stepper.h"
 
 #define STEP_DELAY  200
+#define delayMicroseconds(x) ;
 
 void Stepper::step() 
 {
@@ -18,7 +22,7 @@ void Stepper::step()
 }
 
 
-int Stepper::home(int dir, int mm)
+int Stepper::home(int dir)
 {
     unsigned long travel_steps = 0;
 
@@ -47,9 +51,9 @@ int Stepper::home(int dir, int mm)
         }
     }
 
-    for (int i=mm*steps_per_mm; i>=0; i--) {
+    for (int i=5 * steps_per_mm; i>=0; i--) {
         step();
-        delayMicroseconds(200);
+        delayMicroseconds(300);
         if (travel_steps >= getMaxSteps()) {
             enable(false);
             return -1;
@@ -63,12 +67,11 @@ int Stepper::home(int dir, int mm)
     return 0;
 }
 
-void Stepper::goTo(int mm)
+void Stepper::goTo(uint16_t mm)
 {
     goto_step = mm * steps_per_mm;
 
-    Serial.print("goto_step: ");
-    Serial.print(goto_step);
+    printf("goto_step: %ld\n", goto_step);
 
     if (goto_step == current_steps)
         return;
@@ -121,5 +124,43 @@ int Stepper::update()
         }
         return 1;
     }
+
     return 0;
 }
+
+#define TOOL_X_EN_PIN       7
+#define TOOL_Z_EN_PIN       6
+#define TOOL_X_STEP_PIN     5
+#define TOOL_Z_STEP_PIN     4
+#define TOOL_X_DIR_PIN      3
+#define TOOL_Z_DIR_PIN      2
+#define TOOL_X_ENDSTOP_PIN  16
+#define TOOL_Z_ENDSTOP_PIN  17
+
+#define MICROSTEP           4
+
+Stepper __spindle_x = Stepper(TOOL_X_EN_PIN, TOOL_X_STEP_PIN, TOOL_X_DIR_PIN, TOOL_X_ENDSTOP_PIN, MICROSTEP);
+Stepper __spindle_z = Stepper(TOOL_Z_EN_PIN, TOOL_Z_STEP_PIN, TOOL_Z_DIR_PIN, TOOL_Z_ENDSTOP_PIN, MICROSTEP);
+
+
+int main(int argc, char *argv[])
+{
+
+    uint16_t mm_x = atoi(argv[1]);
+    uint16_t mm_z = atoi(argv[2]);
+
+    printf("Max steps: %ld\n", __spindle_x.getMaxSteps());
+    printf("Go to: %d %d\n", mm_x, mm_z);
+    fflush(stdout);
+
+    __spindle_x.goTo(mm_x);
+    __spindle_z.goTo(mm_z);
+    while (__spindle_z.isRunning() || __spindle_x.isRunning() ) { 
+        __spindle_z.update();
+        __spindle_x.update();
+        printf("Step x: %ld, z: %ld\n", __spindle_x.getSteps(), __spindle_z.getSteps());
+    }
+
+    return 0;
+}
+
