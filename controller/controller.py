@@ -7,6 +7,7 @@ import serial
 
 from pathlib import Path
 from time import sleep
+from pygame import mixer
 
 from cmrobot import Robot
 
@@ -35,8 +36,14 @@ def handle_relax(robot, cmd):
     else:
         robot.relax_joint(cmd['joint'])
 
-def handle_say(cmd):
-    print("say")
+def handle_say(robot, cmd):
+    path = Path(cmd['path'] if 'path' in cmd else None
+    if not path or not path.exists():
+        return
+    print(f"say {path}")
+    mixer.music.load(path.as_posix())
+    mixer.music.play(1)
+
 
 def handle_delay(cmd):
     print(f"delay {cmd['seconds']}")
@@ -93,6 +100,8 @@ def main(argv):
     with open(playlist_path, 'r') as f:
         playlist = json.load(f)
 
+    mixer.init()
+
     robot_config = config['robot']
     head_config = config['head']
 
@@ -130,7 +139,7 @@ def main(argv):
                     elif cmd == 'relax':
                         CMD_HANDLER_MAP[cmd](robot, _)
                     elif cmd == 'say':
-                        CMD_HANDLER_MAP[cmd](_)
+                        CMD_HANDLER_MAP[cmd](robot, _)
                     elif cmd == 'delay':
                         CMD_HANDLER_MAP[cmd](_)
                     elif cmd == 'send':
