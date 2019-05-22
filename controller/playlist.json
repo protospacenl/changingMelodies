@@ -4,10 +4,10 @@
             "wrist_up": { "joints": [ { "name": "wrist",        "pos": 700} ] },
             "wrist_down": { "joints": [ { "name": "wrist",        "pos": 512} ] },
             "rest": { "joints": [ { "name": "shoulder_rot", "pos": 512},
-                                  { "name": "shoulder_ud",  "pos": 512},
+                                  { "name": "shoulder_ud",  "pos": 2048},
                                   { "name": "wrist",        "pos": 512} ] },
             "up":   { "joints": [ { "name": "shoulder_rot", "pos": 123},
-                                  { "name": "shoulder_ud",  "pos": 123},
+                                  { "name": "shoulder_ud",  "pos": 2048},
                                   { "name": "wrist",        "pos": 123} ] }
         },
         "tool": {
