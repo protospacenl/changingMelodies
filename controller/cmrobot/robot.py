@@ -90,6 +90,9 @@ class Robot():
 
     def hold(self):
         self.__controller.hold()
+    
+    def tool_home(self):
+        self.__controller.tool_home()
 
     def monitor(self):
         self.__controller.monitor()

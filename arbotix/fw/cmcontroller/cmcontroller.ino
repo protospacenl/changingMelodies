@@ -31,6 +31,28 @@ PatrickController __patrick = PatrickController(1000000);
 Stepper __spindle_x = Stepper(TOOL_X_EN_PIN, TOOL_X_STEP_PIN, TOOL_X_DIR_PIN, TOOL_X_ENDSTOP_PIN, MICROSTEP);
 Stepper __spindle_z = Stepper(TOOL_Z_EN_PIN, TOOL_Z_STEP_PIN, TOOL_Z_DIR_PIN, TOOL_Z_ENDSTOP_PIN, MICROSTEP);
 
+void tool_home(void)
+{
+    Serial.println("homing X\n");
+    if ( __spindle_x.home(Stepper::BACKWARD, POST_HOME_POSITION_X) < 0) {
+       Serial.println("Error homing X");
+       Serial.write(CMD_RESP_ERR);
+       for (;;) ;
+    }
+    Serial.println("X homed\n");
+    
+    Serial.println("homing Z\n");
+    if ( __spindle_z.home(Stepper::BACKWARD, POST_HOME_POSITION_Z) < 0) {
+       Serial.println("Error homing Y");
+       Serial.write(CMD_RESP_ERR);
+       for (;;) ;
+    }
+    Serial.println("Z homed\n");
+
+    Serial.write(CMD_RESP_ACK);
+}
+
+
 int handle_command(command_t *msg, PatrickController *controller)
 {
     int retval = -1;
@@ -43,6 +65,8 @@ int handle_command(command_t *msg, PatrickController *controller)
         } else {
             Serial.write(retval);
         }
+    } else if (msg->cmd == CMD_TOOL_HOME) {
+        tool_home();
     } else if (msg->cmd == CMD_MONITOR) {
         int pos1 = dxlGetPosition(1); 
         int pos2 = dxlGetPosition(2); 
@@ -96,7 +120,6 @@ int handle_command(command_t *msg, PatrickController *controller)
     }
 }
 
-
 void setup(void)
 {
     Serial.begin(19200);
@@ -104,6 +127,7 @@ void setup(void)
     delay(500);
     /* send ack */
 
+    /*
     Serial.println("homing X\n");
     if ( __spindle_x.home(Stepper::BACKWARD, POST_HOME_POSITION_X) < 0) {
        Serial.println("Error homing X");
@@ -119,6 +143,7 @@ void setup(void)
        for (;;) ;
     }
     Serial.println("Z homed\n");
+    */
 
     Serial.write(CMD_RESP_ACK);
 

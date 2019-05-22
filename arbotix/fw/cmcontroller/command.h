@@ -9,6 +9,7 @@ uint8_t CMD_HEADER[2] = {0xff, 0xff};
 #define CMD_TOOL_POSITION         0x02
 #define CMD_MONITOR               0x03
 #define CMD_HOLD                  0x04
+#define CMD_TOOL_HOME             0x05
 #define CMD_SERVO_GOAL_POSITION   0x1E
 #define CMD_SERVO_MOVING_SPEED    0x20
 #define CMD_SERVO_TORQUE_LIMIT    0x22
@@ -47,6 +48,9 @@ typedef struct __attribute__(( packed)) cmd_hold_t {
     uint8_t id;
 } cmd_hold_t;
 
+typedef struct __attribute__(( packed)) cmd_home_t {
+    uint8_t id;
+} cmd_home_t;
 
 typedef struct __attribute__(( packed)) command_t {
     uint8_t cmd;
@@ -58,6 +62,7 @@ typedef struct __attribute__(( packed)) command_t {
         cmd_tool_position_t tool_position;
         cmd_monitor_t monitor;
         cmd_hold_t hold;
+        cmd_home_t home;
     } params;
 } command_t;
 

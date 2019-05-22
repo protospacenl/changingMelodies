@@ -10,6 +10,7 @@ class Controller(metaclass=Singleton):
     CMD_TOOL_POSITION         = 0x02
     CMD_SERVO_MONITOR         = 0x03
     CMD_SERVO_HOLD            = 0x04
+    CMD_TOOL_HOME             = 0x05
     CMD_SERVO_GOAL_POSITION   = 0x1E
     CMD_SERVO_MOVING_SPEED    = 0x20
     CMD_SERVO_TORQUE_LIMIT    = 0x22
@@ -61,6 +62,10 @@ class Controller(metaclass=Singleton):
     def hold(self):
         self.write(struct.pack('H', self.CMD_HEADER))
         self.write(bytes([self.CMD_SERVO_HOLD, 1, 0]), wait=True)
+
+    def tool_home(self):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_TOOL_HOME, 1, 0]), wait=True)
 
     def monitor(self):
         self.write(struct.pack('H', self.CMD_HEADER))

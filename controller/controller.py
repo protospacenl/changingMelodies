@@ -44,6 +44,9 @@ def handle_say(robot, cmd):
     mixer.music.load(path.as_posix())
     mixer.music.play(1)
 
+def handle_home(robot, cmd):
+    robot.tool_home()
+
 def handle_hold(robot, cmd):
     robot.hold()
 
@@ -68,6 +71,7 @@ CMD_HANDLER_MAP = {
         'relax': handle_relax,
         'say': handle_say,
         'hold': handle_hold,
+        'home': handle_home,
         'delay': handle_delay,
         'wait_for_trigger': handle_wait_trigger,
         "send" : None
@@ -146,6 +150,8 @@ def main(argv):
                     elif cmd == 'delay':
                         CMD_HANDLER_MAP[cmd](robot, _)
                     elif cmd == 'hold':
+                        CMD_HANDLER_MAP[cmd](robot, _)
+                    elif cmd == 'home':
                         CMD_HANDLER_MAP[cmd](robot, _)
                     elif cmd == 'send':
                         if target  == 'head':
