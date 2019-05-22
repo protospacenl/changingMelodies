@@ -8,6 +8,8 @@ class Controller(metaclass=Singleton):
     CMD_HEADER                = 0xffff
     CMD_ADD_SERVO             = 0x01
     CMD_TOOL_POSITION         = 0x02
+    CMD_SERVO_MONITOR         = 0x03
+    CMD_SERVO_HOLD            = 0x04
     CMD_SERVO_GOAL_POSITION   = 0x1E
     CMD_SERVO_MOVING_SPEED    = 0x20
     CMD_SERVO_TORQUE_LIMIT    = 0x22
@@ -55,6 +57,26 @@ class Controller(metaclass=Singleton):
                                     2, id, type)
         print(f"Adding servo: {cmd!r}")
         self.write(cmd, wait=True)
+
+    def hold(self):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_SERVO_HOLD, 1, 0]), wait=True)
+
+    def monitor(self):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_SERVO_MONITOR, 1, 0]))
+        s = b''
+        while True:
+            c = self.__serial.read(1)
+            if c == b'':
+                continue
+            if c == self.CMD_ACK:
+                break
+            s += c
+        print(f"{s}")
+
+        return True
+
 
     def write_joint_position(self, id, position):
         self.write(struct.pack('H', self.CMD_HEADER))

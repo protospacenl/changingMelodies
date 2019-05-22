@@ -88,6 +88,12 @@ class Robot():
         for j in self.joints:
             self.relax_joint(j)
 
+    def hold(self):
+        self.__controller.hold()
+
+    def monitor(self):
+        self.__controller.monitor()
+
     def move_tool_to(self, position, speed=10):
         self.__controller.write_tool_pos(position['x'], position['z'], speed)
 

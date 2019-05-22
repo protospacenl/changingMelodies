@@ -37,15 +37,17 @@ def handle_relax(robot, cmd):
         robot.relax_joint(cmd['joint'])
 
 def handle_say(robot, cmd):
-    path = Path(cmd['path'] if 'path' in cmd else None
+    path = Path(cmd['path']) if 'path' in cmd else None
     if not path or not path.exists():
         return
     print(f"say {path}")
     mixer.music.load(path.as_posix())
     mixer.music.play(1)
 
+def handle_hold(robot, cmd):
+    robot.hold()
 
-def handle_delay(cmd):
+def handle_delay(rebot, cmd):
     print(f"delay {cmd['seconds']}")
     time.sleep(cmd['seconds'])
 
@@ -65,6 +67,7 @@ CMD_HANDLER_MAP = {
         },
         'relax': handle_relax,
         'say': handle_say,
+        'hold': handle_hold,
         'delay': handle_delay,
         'wait_for_trigger': handle_wait_trigger,
         "send" : None
@@ -141,7 +144,9 @@ def main(argv):
                     elif cmd == 'say':
                         CMD_HANDLER_MAP[cmd](robot, _)
                     elif cmd == 'delay':
-                        CMD_HANDLER_MAP[cmd](_)
+                        CMD_HANDLER_MAP[cmd](robot, _)
+                    elif cmd == 'hold':
+                        CMD_HANDLER_MAP[cmd](robot, _)
                     elif cmd == 'send':
                         if target  == 'head':
                             print(f"\n\n\n\n\nSending data to head: ")
