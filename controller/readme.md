@@ -73,13 +73,13 @@ De __position__ velden in de move commando's verwijzen naar de posities gemaakt 
 
         { "target": "_",    "cmd": "delay",  "seconds": 5, "#": "Wacht voor seconds seconden" },
 
-        { "target": "tool","cmd": "move",   "position": "center", "speed": 1, "#": "beweeg de tool arm naar positie center, snelheid is op dit moment genegeerd" },
+        { "target": "tool", "cmd": "move",   "position": "center", "speed": 1, "#": "beweeg de tool arm naar positie center, snelheid is op dit moment genegeerd" },
 
         { "target": "arm",  "cmd": "relax",  "joint": "all", "#": "relax de gehele arm" },
 
         { "target": "arm",  "cmd": "relax",  "joint": "wrist", "#": "relax de pols" },
 
-        { "target": "head","cmd": "say",    "text": "hallo", "#": "Zeg iets. TODO:nog niet geimplementeerd!" },
+        { "target": "head", "cmd": "say",    "path": "/path/to/file.wave", "#": "Speel wav file" },
     ]
 }
 ```
