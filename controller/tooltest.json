@@ -21,9 +21,9 @@
         },
         "tool": {
             "home": { "x": 0, "z": 0},
-            "up": { "x": 50, "z": 30},
+            "up": { "x": 192, "z": 30},
             "center": { "x": 204, "z": 30},
-            "down": { "x": 204, "z": 20},
+            "down": { "x": 192, "z": 5},
             "test1":{"x":150, "z": 40},
            	"test2":{"x":160, "z": 20},
             "test3":{"x":170, "z": 30},
@@ -35,12 +35,14 @@
 
     "playlist": [
     	       
+                { "target": "tool", "cmd": "home" },
+
     	{ "target": "head", "cmd": "send", "data": "A"},
    { "target": "tool",  "cmd": "move",   "position": "up", "speed": 70 },
 
 	{ "target": "_",    "cmd": "delay",  "seconds": 3 },
-	   { "target": "tool",  "cmd": "move",   "position": "up", "speed": 70 },
-	{ "target": "_",    "cmd": "delay",  "seconds": 3 },
+	   { "target": "tool",  "cmd": "move",   "position": "down", "speed": 70 },
+	{ "target": "_",    "cmd": "delay",  "seconds": 10 },
 	    	{ "target": "tool",  "cmd": "move",   "position": "test1", "speed": 70 },
 	    	{ "target": "_",    "cmd": "delay",  "seconds": 3 },
 	    	{ "target": "tool",  "cmd": "move",   "position": "test2", "speed": 70 },

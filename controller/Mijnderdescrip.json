@@ -75,7 +75,7 @@
             "uithoog": { "x": 192, "z": 40},
             "uithoogLaag": { "x": 192, "z": 5},
             "trekken": { "x": 180, "z": 7},
-            "trekmeer": { "x": 170, "z": 40},
+            "trekmeer": { "x": 170, "z": 7},
             "down": { "x": 204, "z": 20}
         }
     },
@@ -131,7 +131,7 @@
 
        { "target": "_",    "cmd": "delay",  "seconds": 5 },
            	{ "target": "head", "cmd": "send", "data": "C"},
-       { "target": "head", "cmd": "say",    "path": "voices/start3", "#": "Speel wav file" },
+       { "target": "head", "cmd": "say",    "path": "voices/start3.wav", "#": "Speel wav file" },
 
 
     { "target": "arm",  "cmd": "move",   "position": "strek", "speed": 70 },
@@ -143,16 +143,19 @@
 
        { "target": "_",    "cmd": "delay",  "seconds": 6 },
 
-    { "target": "head", "cmd": "say",    "path": "voices/pedaal", "#": "Speel wav file" },
+    { "target": "head", "cmd": "say",    "path": "voices/pedaal.wav", "#": "Speel wav file" },
     { "target": "head", "cmd": "send", "data": "B"},
 
        { "target": "_",    "cmd": "delay",  "seconds": 6 },
 
-    	 { "target": "head", "cmd": "say",    "path": "voices/klei1", "#": "Speel wav file" },
+    	 { "target": "head", "cmd": "say",    "path": "voices/klei1.wav", "#": "Speel wav file" },
        { "target": "head", "cmd": "send", "data": "B"},
-              { "target": "_",    "cmd": "delay",  "seconds": 6 },
+              { "target": "_",    "cmd": "delay",  "seconds": 15 },
 
        { "target": "head", "cmd": "send", "data": "E"},
+           { "target": "arm",  "cmd": "move",   "position": "tussen2", "speed": 70, "#": "Ga naar Klei" },
+
+       { "target": "_",    "cmd": "delay",  "seconds": 2 },
 
     { "target": "arm",  "cmd": "move",   "position": "klei", "speed": 70, "#": "Ga naar Klei" },
        { "target": "_",    "cmd": "delay",  "seconds": 2 },
@@ -176,7 +179,7 @@
        { "target": "head", "cmd": "send", "data": "E"},
 	   { "target": "head", "cmd": "send", "data": "B"},
        { "target": "_",    "cmd": "delay",  "seconds": 2 },
-       { "target": "head", "cmd": "say",    "path": "voices/klei2", "#": "Speel wav file" },
+       { "target": "head", "cmd": "say",    "path": "voices/klei2.wav", "#": "Speel wav file" },
 	   { "target": "head", "cmd": "send", "data": "C"},
        { "target": "_",    "cmd": "delay",  "seconds": 5 },
        { "target": "head", "cmd": "send", "data": "B"},
@@ -187,7 +190,7 @@
            { "target": "_",    "cmd": "delay",  "seconds": 20 },
 
         { "target": "arm",  "cmd": "move",   "position": "klei3", "speed": 70 },
-        { "target": "head", "cmd": "say",    "path": "voices/klei3", "#": "Speel wav file" },
+        { "target": "head", "cmd": "say",    "path": "voices/klei3.wav", "#": "Speel wav file" },
         { "target": "head", "cmd": "send", "data": "C"},
 			{ "target": "_",    "cmd": "delay",  "seconds": 5 },
 		{ "target": "head", "cmd": "send", "data": "A"},
@@ -199,7 +202,7 @@
 
            { "target": "_",    "cmd": "delay",  "seconds": 10 },
 
-    { "target": "head", "cmd": "say",    "path": "voices/klei4", "#": "Speel wav file" },
+    { "target": "head", "cmd": "say",    "path": "voices/klei4.wav", "#": "Speel wav file" },
     { "target": "tool",  "cmd": "move",   "position": "uithoogLaag", "speed": 70 },
 
            { "target": "_",    "cmd": "delay",  "seconds": 5 },
@@ -215,7 +218,7 @@
     { "target": "head", "cmd": "send", "data": "E"},
 
            { "target": "_",    "cmd": "delay",  "seconds": 5 },
-  	{ "target": "head", "cmd": "say",    "path": "voices/klei5", "#": "Speel wav file" },
+  	{ "target": "head", "cmd": "say",    "path": "voices/klei5.wav", "#": "Speel wav file" },
      { "target": "tool",  "cmd": "move",   "position": "up", "speed": 30 },
      { "target": "arm",  "cmd": "move",   "position": "tussen3", "speed": 70 },
 
@@ -224,13 +227,13 @@
 	 { "target": "arm",  "cmd": "move",   "position": "klei3", "speed": 70 },
 		 { "target": "_",    "cmd": "delay",  "seconds": 5 },
 	 { "target": "arm",  "cmd": "relax",  "joint": "wrist", "#": "relax de pols" },
-	 { "target": "head", "cmd": "say",    "path": "voices/klei6", "#": "Speel wav file" },
+	 { "target": "head", "cmd": "say",    "path": "voices/klei6.wav", "#": "Speel wav file" },
 	     { "target": "head", "cmd": "send", "data": "C"},
 		 { "target": "_",    "cmd": "delay",  "seconds": 5 },
 	     { "target": "head", "cmd": "send", "data": "A"},
 	 { "target": "arm",  "cmd": "move",   "position": "klei3", "speed": 70 },
 		 { "target": "_",    "cmd": "delay",  "seconds": 15 },
-	 { "target": "head", "cmd": "say",    "path": "voices/eind1", "#": "Speel wav file" },
+	 { "target": "head", "cmd": "say",    "path": "voices/eind1.wav", "#": "Speel wav file" },
 
 	 { "target": "arm",  "cmd": "move",   "position": "tussen4", "speed": 70 },
 	 	{ "target": "_",    "cmd": "delay",  "seconds": 5 },
