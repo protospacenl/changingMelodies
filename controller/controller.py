@@ -107,7 +107,7 @@ def main(argv):
     with open(playlist_path, 'r') as f:
         playlist = json.load(f)
 
-    mixer.init()
+    mixer.init(frequency=8000)
 
     robot_config = config['robot']
     head_config = config['head']
@@ -173,10 +173,6 @@ def main(argv):
                                     break
     except KeyboardInterrupt:
         #242 2254 462
-        robot.move_joints_to([{ "name": "shoulder_rot", "pos": 355},
-                                          { "name": "shoulder_ud",  "pos": 2386},
-                                          { "name": "wrist", "pos": 446} ] ,
-         speed=50, torque=0, wait=10)
         robot.relax_all()
 
                 
