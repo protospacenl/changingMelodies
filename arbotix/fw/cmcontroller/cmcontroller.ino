@@ -67,6 +67,23 @@ int handle_command(command_t *msg, PatrickController *controller)
         }
     } else if (msg->cmd == CMD_TOOL_HOME) {
         tool_home();
+    } else if (msg->cmd == CMD_SERVO_REPORT) {
+        cmd_servo_report_t * cmd = (cmd_servo_report_t*)&msg->params;
+
+        int pos = dxlGetPosition(cmd->id); 
+        int v = dxlGetVoltage(cmd->id);
+        int t = dxlGetTemperature(cmd->id);
+        int err = dxlGetError(cmd->id);
+
+        Serial.print(pos);
+        Serial.print(",");
+        Serial.print(v);
+        Serial.print(",");
+        Serial.print(t);
+        Serial.print(",");
+        Serial.print(err);
+        Serial.println(",");
+        
     } else if (msg->cmd == CMD_MONITOR) {
         int pos1 = dxlGetPosition(1); 
         int pos2 = dxlGetPosition(2); 

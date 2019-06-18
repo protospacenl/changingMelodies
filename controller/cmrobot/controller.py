@@ -11,9 +11,18 @@ class Controller(metaclass=Singleton):
     CMD_SERVO_MONITOR         = 0x03
     CMD_SERVO_HOLD            = 0x04
     CMD_TOOL_HOME             = 0x05
+    CMD_SERVO_REPORT          = 0x06
     CMD_SERVO_GOAL_POSITION   = 0x1E
     CMD_SERVO_MOVING_SPEED    = 0x20
     CMD_SERVO_TORQUE_LIMIT    = 0x22
+
+    ERR_DICT = [ {'name': 'VOLTAGE', 'mask': 0x01 },
+                 {'name': 'ANGLE_LIMIT', 'mask': 0x04 },
+                 {'name': 'OVERHEATING', 'mask': 0x08 },
+                 {'name': 'CHECKSUM', 'mask': 0x16 },
+                 {'name': 'OVERLOAD', 'mask': 0x32 },
+                 {'name': 'INSTRUCTION', 'mask': 0x64 }]
+
 
     def __init__(self, port="/dev/ttyUSB0", baudrate=19200, timeout=1, **kw):
         self.__port = port
@@ -80,6 +89,34 @@ class Controller(metaclass=Singleton):
             s += c
         print(f"{s}")
 
+        return True
+
+    def report(self, name, id):
+        self.write(struct.pack('H', self.CMD_HEADER))
+        self.write(bytes([self.CMD_SERVO_REPORT, 1, id]))
+        s = b''
+        while True:
+            c = self.__serial.read(1)
+            if c == b'':
+                continue
+            if c == self.CMD_ACK:
+                break
+            s += c
+
+        v = s.decode().split(',')
+
+        if len(v) <= 1 or len(v) > 5:
+            return False
+
+        errors = ''
+        error_byte = int(v[3])
+        for e in self.ERR_DICT:
+            if error_byte & e['mask']:
+                errors = errors + " " + e['name']
+        if errors == '':
+            errors = 'NONE'
+
+        print(f"{name} -> Pos: {v[0]}, Voltage: {int(v[1])/10}, Temperature: {v[2]}, Error: {errors}")
         return True
 
 

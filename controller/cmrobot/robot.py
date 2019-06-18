@@ -97,6 +97,12 @@ class Robot():
     def monitor(self):
         self.__controller.monitor()
 
+    def report(self):
+        print("\n************** SERVO REPORT *************\n")
+        for j in self.joints:
+            self.__controller.report(j, self.__joints[j].id)
+        print("\n************** ***** ****** *************\n")
+
     def move_tool_to(self, position, speed=10):
         self.__controller.write_tool_pos(position['x'], position['z'], speed)
 

@@ -5,6 +5,7 @@ import operator
 import time
 import serial
 
+from datetime import datetime
 from pathlib import Path
 from time import sleep
 from pygame import mixer
@@ -133,6 +134,7 @@ def main(argv):
             robot.monitor()
             time.sleep(.5)
     try:
+        start_time      = datetime.now()
         while True:
             for _ in playlist:
                 cmd = _['cmd']
@@ -171,6 +173,11 @@ def main(argv):
                             if 'on_timeout' in _:
                                 if _['on_timeout'] == 'restart':
                                     break
+                t2 = datetime.now()
+                if (t2 - start_time).seconds >= 1:
+                    robot.report()
+                    start_time = t2
+
     except KeyboardInterrupt:
         #242 2254 462
         robot.relax_all()
