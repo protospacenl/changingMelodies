@@ -33,6 +33,7 @@ class Stepper {
             this->frame_delay = 0;
         };
 
+        uint8_t isRunning() { return running; };
         uint8_t getDirection() { return current_direction; }
         void setDirection(uint8_t direction) { 
             current_direction = direction;
@@ -46,20 +47,20 @@ class Stepper {
                 digitalWrite(this->enable_pin, LOW);
         };
 
-        int home(int dir);
+        int home(int dir, int mm);
 
         void resetSteps() { current_steps = 0; };
         unsigned long getSteps() { return current_steps; };
         unsigned long getMaxSteps() { return max_steps; };
 
-        void goTo(int pos, int speed);
+        void goTo(int pos);
         void step();
         void step(int dir) {
             setDirection(dir);
             step();
         };
 
-        void update();
+        int update();
 
     private:
         unsigned long current_steps;
