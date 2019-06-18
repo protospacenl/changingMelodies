@@ -12,10 +12,7 @@
 #define TOOL_X_ENDSTOP_PIN  16
 #define TOOL_Z_ENDSTOP_PIN  17
 
-#define MICROSTEP           4
-
-#define POST_HOME_POSITION_X    120 /* mm */
-#define POST_HOME_POSITION_Z    25
+#define MICROSTEP           8
 
 #define SERIAL_TIMEOUT      5000
 
@@ -31,28 +28,6 @@ PatrickController __patrick = PatrickController(1000000);
 Stepper __spindle_x = Stepper(TOOL_X_EN_PIN, TOOL_X_STEP_PIN, TOOL_X_DIR_PIN, TOOL_X_ENDSTOP_PIN, MICROSTEP);
 Stepper __spindle_z = Stepper(TOOL_Z_EN_PIN, TOOL_Z_STEP_PIN, TOOL_Z_DIR_PIN, TOOL_Z_ENDSTOP_PIN, MICROSTEP);
 
-void tool_home(void)
-{
-    Serial.println("homing X\n");
-    if ( __spindle_x.home(Stepper::BACKWARD, POST_HOME_POSITION_X) < 0) {
-       Serial.println("Error homing X");
-       Serial.write(CMD_RESP_ERR);
-       for (;;) ;
-    }
-    Serial.println("X homed\n");
-    
-    Serial.println("homing Z\n");
-    if ( __spindle_z.home(Stepper::BACKWARD, POST_HOME_POSITION_Z) < 0) {
-       Serial.println("Error homing Y");
-       Serial.write(CMD_RESP_ERR);
-       for (;;) ;
-    }
-    Serial.println("Z homed\n");
-
-    Serial.write(CMD_RESP_ACK);
-}
-
-
 int handle_command(command_t *msg, PatrickController *controller)
 {
     int retval = -1;
@@ -65,39 +40,10 @@ int handle_command(command_t *msg, PatrickController *controller)
         } else {
             Serial.write(retval);
         }
-    } else if (msg->cmd == CMD_TOOL_HOME) {
-        tool_home();
-    } else if (msg->cmd == CMD_MONITOR) {
-        int pos1 = dxlGetPosition(1); 
-        int pos2 = dxlGetPosition(2); 
-        int pos3 = dxlGetPosition(3); 
-        Serial.print(pos1);
-        Serial.print(", ");
-        Serial.print(pos2);
-        Serial.print(", ");
-        Serial.println(pos3);
-    } else if (msg->cmd == CMD_HOLD) {
-        int pos1 = dxlGetPosition(1); 
-        int pos2 = dxlGetPosition(2); 
-        int pos3 = dxlGetPosition(3); 
-        dxlTorqueOn(1);
-        delay(3);
-        __patrick.setServoPosition(1, pos1);
-        dxlTorqueOn(2);
-        delay(3);
-        __patrick.setServoPosition(2, pos2);
-        dxlTorqueOn(3);
-        delay(3);
-        __patrick.setServoPosition(3, pos3);
     } else if (msg->cmd == CMD_TOOL_POSITION) {
         cmd_tool_position_t * cmd = (cmd_tool_position_t*)&msg->params;
-        __spindle_z.goTo(cmd->z);
-        __spindle_x.goTo(cmd->x);
-        while (__spindle_z.isRunning() || __spindle_x.isRunning() ) { 
-            __spindle_z.update();
-            __spindle_x.update();
-            delayMicroseconds(200);
-        }
+        __spindle_x.goTo(cmd->x, cmd->mms);
+        __spindle_z.goTo(cmd->z, cmd->mms);
     } else if (msg->cmd == CMD_SERVO_GOAL_POSITION) {
         cmd_position_t * cmd = (cmd_position_t*)&msg->params;
         dxlTorqueOn(cmd->id);
@@ -106,9 +52,11 @@ int handle_command(command_t *msg, PatrickController *controller)
         //__patrick.initNextPosition(cmd->id, cmd->position);
     } else if (msg->cmd == CMD_SERVO_MOVING_SPEED) {
         cmd_speed_t * cmd = (cmd_speed_t*)&msg->params;
+        Serial.print(cmd->speed);
         __patrick.setServoSpeed(cmd->id, cmd->speed);
     } else if (msg->cmd == CMD_SERVO_TORQUE_LIMIT) {
         cmd_torque_t * cmd = (cmd_torque_t*)&msg->params;
+        Serial.print(cmd->torque);
         if (cmd->torque == 0) {
             dxlTorqueOff(cmd->id);
         } else {
@@ -120,6 +68,7 @@ int handle_command(command_t *msg, PatrickController *controller)
     }
 }
 
+
 void setup(void)
 {
     Serial.begin(19200);
@@ -127,9 +76,8 @@ void setup(void)
     delay(500);
     /* send ack */
 
-    /*
     Serial.println("homing X\n");
-    if ( __spindle_x.home(Stepper::BACKWARD, POST_HOME_POSITION_X) < 0) {
+    if ( __spindle_x.home(Stepper::BACKWARD) < 0) {
        Serial.println("Error homing X");
        Serial.write(CMD_RESP_ERR);
        for (;;) ;
@@ -137,13 +85,12 @@ void setup(void)
     Serial.println("X homed\n");
     
     Serial.println("homing Z\n");
-    if ( __spindle_z.home(Stepper::BACKWARD, POST_HOME_POSITION_Z) < 0) {
+    if ( __spindle_z.home(Stepper::BACKWARD) < 0) {
        Serial.println("Error homing Y");
        Serial.write(CMD_RESP_ERR);
        for (;;) ;
     }
     Serial.println("Z homed\n");
-    */
 
     Serial.write(CMD_RESP_ACK);
 
@@ -183,6 +130,6 @@ void loop(void)
     }
 
     __patrick.updateServos();
-    //__spindle_x.update();
-    //__spindle_z.update();
+    __spindle_x.update();
+    __spindle_z.update();
 }
