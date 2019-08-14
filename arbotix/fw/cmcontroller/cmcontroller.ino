@@ -69,20 +69,33 @@ int handle_command(command_t *msg, PatrickController *controller)
         tool_home();
     } else if (msg->cmd == CMD_SERVO_REPORT) {
         cmd_servo_report_t * cmd = (cmd_servo_report_t*)&msg->params;
+        servo_t *servo = controller->getServo(cmd->id);
 
-        int pos = dxlGetPosition(cmd->id); 
-        int v = dxlGetVoltage(cmd->id);
-        int t = dxlGetTemperature(cmd->id);
-        int err = dxlGetError(cmd->id);
+        if (servo != NULL) {
+            int pos = dxlGetPosition(cmd->id); 
+            int v = dxlGetVoltage(cmd->id);
+            int t = dxlGetTemperature(cmd->id);
+            int a = -1;
+            int fwv = dxlGetFirmwareVersion(cmd->id);
+            int err = dxlGetError(cmd->id);
+            
+            if (servo->type == SERVO_TYPE_MX) {
+                a = mxGetCurrent(cmd->id);
+            }
 
-        Serial.print(pos);
-        Serial.print(",");
-        Serial.print(v);
-        Serial.print(",");
-        Serial.print(t);
-        Serial.print(",");
-        Serial.print(err);
-        Serial.println(",");
+            Serial.print(fwv);
+            Serial.print(",");
+            Serial.print(pos);
+            Serial.print(",");
+            Serial.print(v);
+            Serial.print(",");
+            Serial.print(t);
+            Serial.print(",");
+            Serial.print(a);
+            Serial.print(",");
+            Serial.print(err);
+            Serial.println("");
+        }
         
     } else if (msg->cmd == CMD_MONITOR) {
         int pos1 = dxlGetPosition(1); 
