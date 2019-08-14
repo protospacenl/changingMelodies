@@ -30,6 +30,10 @@ class Joint():
     def type_id(self):
         return self.__type_id
 
+    @property
+    def params(self):
+        return self.__params
+
 
     def set_goal_position(self, position):
         self.__controller.write_joint_position(self.id, position)
@@ -38,12 +42,11 @@ class Joint():
         self.__controller.write_joint_speed(self.id, speed)
 
     def set_torque_limit(self, torque):
+        if torque == -1:
+            torque = self.MAX_TORQUE_LIMIT
         self.__controller.write_joint_torque(self.id, torque)
 
     def move_to(self, position, speed=0, torque=0):
-        if torque == 0:
-            torque = self.MAX_TORQUE_LIMIT
-
         print(f"moving {self.name} to {position} with speed: {speed} and torque {torque}")
         self.set_moving_speed(speed)
         self.set_torque_limit(torque)
@@ -53,6 +56,14 @@ class Joint():
         print(f"{self.name} relaxing")
         self.set_torque_limit(0)
 
+    def hold(self):
+        print(f"{self.name} holding")
+        if 'holding_torque' in self.params:
+            self.set_torque_limit(self.params['holding_torque'])
+            if self.params['holding_torque'] > 0:
+                self.__controller.hold(self.id)
+        else:
+            self.__controller.hold(self.id)
 
 class JointMX(Joint):
     MAX_MOVING_SPEED    = 0x3FF
@@ -63,11 +74,11 @@ class JointMX(Joint):
         
 
     def move_to(self, position, speed=0, torque=0):
-        print("MX move")
+        #print("MX move")
         super(JointMX, self).move_to(position, speed, torque)
 
     def relax(self):
-        print("MX relax")
+        #print("MX relax")
         super(JointMX, self).relax()
 
 class JointAX(Joint):
@@ -75,11 +86,11 @@ class JointAX(Joint):
         super(JointAX, self).__init__(type_id=self.SERVO_TYPE_AX, **kw)
 
     def move_to(self, position, speed=0, torque=0):
-        print("AX move")
+        #print("AX move")
         super(JointAX, self).move_to(position, speed, torque)
 
     def relax(self):
-        print("AX relax")
+        #print("AX relax")
         super(JointAX, self).relax()
 
 

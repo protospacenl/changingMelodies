@@ -42,7 +42,7 @@ class Controller(metaclass=Singleton):
             ack = self.__serial.read(1)
             if ack == b'':
                 continue
-            print(f"got ack: {ack!r}")
+            #print(f"got ack: {ack!r}")
             if ack == self.CMD_ACK:
                 return True
         return False
@@ -61,16 +61,16 @@ class Controller(metaclass=Singleton):
         print(f"Got response: {ret!r}")
         return True if ret == self.CMD_ACK else False
 
-    def add_servo(self, id, type):
-        cmd = struct.pack('HBBBB', self.CMD_HEADER, 
+    def add_servo(self, id, type, P):
+        cmd = struct.pack('HBBBBB', self.CMD_HEADER, 
                                     self.CMD_ADD_SERVO, 
-                                    2, id, type)
+                                    3, id, type, P)
         print(f"Adding servo: {cmd!r}")
         self.write(cmd, wait=True)
 
-    def hold(self):
+    def hold(self, id):
         self.write(struct.pack('H', self.CMD_HEADER))
-        self.write(bytes([self.CMD_SERVO_HOLD, 1, 0]), wait=True)
+        self.write(bytes([self.CMD_SERVO_HOLD, 1, id]), wait=True)
 
     def tool_home(self):
         self.write(struct.pack('H', self.CMD_HEADER))
@@ -89,7 +89,7 @@ class Controller(metaclass=Singleton):
             s += c
         print(f"{s}")
 
-        return True
+        return s
 
     def report(self, name, id):
         self.write(struct.pack('H', self.CMD_HEADER))
@@ -106,21 +106,21 @@ class Controller(metaclass=Singleton):
         print(s)
         v = s.decode().split(',')
 
-        if len(v) <= 1 or len(v) > 6:
+        if len(v) <= 1 or len(v) > 8:
             return False
 
-        current = int(v[4])
-        current = 0.0038 * (current - 2048)
+        load = int(v[6]) - 1024
+        #current = 0.0045 * current
 
         errors = ''
-        error_byte = int(v[5])
+        error_byte = int(v[7])
         for e in self.ERR_DICT:
             if error_byte & e['mask']:
                 errors = errors + " " + e['name']
         if errors == '':
             errors = 'NONE'
 
-        print(f"{name} -> Fwv: {v[0]}, Pos: {v[1]}, Voltage: {int(v[2])/10}, Temperature: {v[3]}, A: {current}, Error: {errors}")
+        print(f"{name} -> ID:{v[0]}, Type:{v[1]}, Fwv: {v[2]}, Pos: {v[3]}, Voltage: {int(v[4])/10}, Temperature: {v[5]}, Load: {load}, Error: {errors}")
         return True
 
 

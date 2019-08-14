@@ -49,7 +49,10 @@ def handle_home(robot, cmd):
     robot.tool_home()
 
 def handle_hold(robot, cmd):
-    robot.hold()
+    if cmd['joint'] == 'all':
+        robot.hold_all()
+    else:
+        robot.hold_joint(['joint'])
 
 def handle_delay(rebot, cmd):
     print(f"delay {cmd['seconds']}")
@@ -67,6 +70,7 @@ def handle_wait_trigger(robot, cmd):
 CMD_HANDLER_MAP = {
         'move': { 
             'arm': handle_move_arm,
+            'head': handle_move_arm,
             'tool': handle_move_tool
         },
         'relax': handle_relax,
@@ -85,11 +89,14 @@ def main(argv):
     playlist        = None
     head            = None
     monitor         = False
+    interactive     = False
+    outpath         = None
+    outfile         = None
 
     try:
-        opts, args = getopt.getopt(argv[1:], "hc:p:m", ["config=","playlist=","monitor="])
+        opts, args = getopt.getopt(argv[1:], "hc:p:o:mi", ["config=","playlist=","out=", "monitor","interactive"])
     except getopt.GetoptError:
-        print('{} -c <config> -p <playlist> -m'.format(sys.argv[0]))
+        print('{} -c <config> -p <playlist> -o <path> -m -i'.format(sys.argv[0]))
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
@@ -99,8 +106,12 @@ def main(argv):
             config_path = arg
         elif opt in ("-p", "--playlist"):
             playlist_path = arg
+        elif opt in ("-o", "--out"):
+            outpath = arg
         elif opt in ("-m", "--monitor"):
             monitor = True
+        elif opt in ("-i", "--interactive"):
+            interactive = True
 
     with open(config_path, 'r') as f:
         config = json.load(f)
@@ -108,10 +119,17 @@ def main(argv):
     with open(playlist_path, 'r') as f:
         playlist = json.load(f)
 
+    if outpath:
+        outfile = open(outpath, 'a+')
+
     mixer.init(frequency=8000)
 
     robot_config = config['robot']
-    head_config = config['head']
+    try:
+        head_config = config['head']
+    except KeyError:
+        print("No head")
+        head_config = None
 
     robot = Robot(**config['robot'])
     robot.connect()
@@ -120,19 +138,48 @@ def main(argv):
     robot.add_joints(joints)
 
     arm_positions = playlist['positions']['arm']
+    if 'head' in playlist['positions']:
+        head_positions = playlist['positions']['head']
     tool_positions = playlist['positions']['tool']
     playlist = playlist['playlist']
 
     print(f"Created robot with joints {robot.joints}")
 
-    head = serial.Serial(head_config['port'], head_config['baudrate'], timeout=head_config['timeout'])
-    print(f"Opened connection to the head")
+    if head_config:
+        head = serial.Serial(head_config['port'], head_config['baudrate'], timeout=head_config['timeout'])
+        print(f"Opened connection to the head")
 
     if monitor:
         robot.relax_all()
         while True:
             robot.monitor()
             time.sleep(.5)
+
+
+    if interactive:
+        robot.relax_all()
+        print("Interactive mode:")
+        print("\t?: help")
+        print("\th: hold")
+        print("\tr: release")
+        print("\tp: print positions")
+        print("\ts: save positions to file given with -o")
+        print("")
+
+        while True:
+            cmd = input("Command: ").lower()
+            if cmd == 'h':
+                print('Holding')
+                robot.hold_all()
+            elif cmd == 'r':
+                print('Relaxing')
+                robot.relax_all()
+            elif cmd == 'p':
+                s = robot.monitor()
+                print("positions: {}".format(s))
+            else:
+               print('unkown command')
+
     try:
         start_time      = datetime.now()
         delay_start     = None
@@ -153,6 +200,8 @@ def main(argv):
                         if cmd == 'move':
                             if target == 'arm':
                                 CMD_HANDLER_MAP[cmd][target](robot, arm_positions, _)
+                            if target == 'head':
+                                CMD_HANDLER_MAP[cmd][target](robot, head_positions, _)
                             elif target == 'tool':
                                 CMD_HANDLER_MAP[cmd][target](robot, tool_positions, _)
                         elif cmd == 'relax':
@@ -203,7 +252,7 @@ def main(argv):
         #242 2254 462
         robot.relax_all()
 
-
+    close(outfile)
 
 if __name__ == "__main__":
     main(sys.argv)

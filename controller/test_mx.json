@@ -1,0 +1,41 @@
+{
+    "positions": {
+        "arm": {
+            "rest": { "joints": [ { "name": "shoulder_rot", "pos": 732, "torque": 256},
+                                  { "name": "shoulder_ud",  "pos": 1056, "torque": 200},
+                                  { "name": "wrist",        "pos": 2048, "torque": 200} ] },
+            "up":   { "joints": [ { "name": "shoulder_rot", "pos": 572, "torque": 512},
+                                  { "name": "shoulder_ud",  "pos": 1309, "torque": 200},
+                                  { "name": "wrist",        "pos": 2806, "torque": 200} ] },
+	    "shoulder_safe": { "joints": [ { "name": "shoulder_rot", "pos": 732, "torque": 512} ]},
+            "relax":   { "joints": [ { "name": "shoulder_rot", "pos": 572, "torque": 1},
+                                  { "name": "shoulder_ud",  "pos": 1309, "torque": 50},
+                                  { "name": "wrist",        "pos": 2806, "torque": 50} ] }
+        },
+	"head": {
+	   "rest": { "joints": [  { "name": "neck_rot", "pos": 872, "torque": 256},
+                                  { "name": "neck_up",  "pos": 261, "torque": 400} ] },
+	   "up": { "joints": [  { "name": "neck_rot", "pos": 644, "torque": 256},
+                                  { "name": "neck_up",  "pos": 602, "torque": 400} ] }
+	},
+        "tool": {
+            "center": { "x": 200, "z": 40 },
+            "down": { "x": 200, "z": 20 },
+            "up": { "x": 50, "z": 40 },
+            "home": { "x": 0, "z": 0 }
+        }
+    },
+
+    "playlist": [
+        { "target": "arm",  "cmd": "move",   "position": "up", "speed": 300 },
+        { "target": "head",  "cmd": "move",   "position": "up", "speed": 100 },
+        { "target": "_",    "cmd": "delay",  "seconds": 2 },
+        { "target": "arm",  "cmd": "move",   "position": "relax", "speed": 300 },
+	{ "target": "_",    "cmd": "relax",  "joint": "shoulder_rot" },
+        { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "arm",  "cmd": "move",   "position": "rest", "speed": 300 },
+        { "target": "head", "cmd": "move",  "position": "rest", "speed": 200 },
+        { "target": "arm",  "cmd": "hold",   "joint": "all"},
+        { "target": "_",    "cmd": "delay",  "seconds": 5 }
+    ]
+}

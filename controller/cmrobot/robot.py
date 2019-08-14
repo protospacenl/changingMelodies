@@ -55,7 +55,11 @@ class Robot():
         elif joint['type'].lower() == 'mx':
             nj = JointMX(**joint, controller=self.__controller)
 
-        self.__controller.add_servo(nj.id, nj.type_id)
+        P = 0 
+        if nj.type == 'MX' and 'PGain' in nj.params:
+            P = nj.params['PGain']
+
+        self.__controller.add_servo(nj.id, nj.type_id, P)
         self.__joints[nj.name] = nj
         
         return nj
@@ -88,14 +92,20 @@ class Robot():
         for j in self.joints:
             self.relax_joint(j)
 
-    def hold(self):
-        self.__controller.hold()
+    def hold_joint(self, name):
+        if not name in self.joints:
+            return
+        self.__joints[name].hold()
     
+    def hold_all(self):
+        for j in self.joints:
+            self.hold_joint(j)
+
     def tool_home(self):
         self.__controller.tool_home()
 
     def monitor(self):
-        self.__controller.monitor()
+        return self.__controller.monitor()
 
     def report(self):
         print("\n************** SERVO REPORT *************\n")
