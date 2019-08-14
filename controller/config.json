@@ -30,8 +30,8 @@
             "type": "MX",
             "id": 1,
             "params": {
-                "cw_angle_limit": 202,
-                "ccw_angle_limit": 601,
+                "cw_angle_limit": 2048,
+                "ccw_angle_limit": 1145,
                 "torque_limit": 1.0
             }
         },
@@ -40,8 +40,8 @@
             "type": "MX",
             "id": 2,
             "params": {
-                "cw_angle_limit": 198,
-                "ccw_angle_limit": 799,
+                "ccw_angle_limit": 1000,
+                "cw_angle_limit": 3050,
                 "torque_limit": 1.0
             }
         },
@@ -50,10 +50,31 @@
             "type": "MX",
             "id": 3,
             "params": {
+                "ccw_angle_limit": 2048,
+                "cw_angle_limit": 3220,
+                "torque_limit": 1.0
+            }
+        },
+        {   
+            "name": "neck_rot",
+            "type": "AX",
+            "id": 4,
+            "params": {
+                "cw_angle_limit": 190,
+                "ccw_angle_limit": 788,
+                "torque_limit": 1.0
+            }
+	},
+        {   
+            "name": "neck_ud",
+            "type": "AX",
+            "id": 5,
+            "params": {
                 "cw_angle_limit": 190,
                 "ccw_angle_limit": 788,
                 "torque_limit": 1.0
             }
         }
+ 
     ]
 }
