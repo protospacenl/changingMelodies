@@ -135,55 +135,74 @@ def main(argv):
             time.sleep(.5)
     try:
         start_time      = datetime.now()
+        delay_start     = None
+        delay_for_s     = None
+        wait_for_delay  = False
+
+        playlist_iterator = iter(playlist)
+
         while True:
-            for _ in playlist:
-                cmd = _['cmd']
-                target = _['target'] if 'target' in _ else None
-                if cmd in CMD_HANDLER_MAP.keys():
-                    if cmd == 'move':
-                        if target == 'arm':
-                            CMD_HANDLER_MAP[cmd][target](robot, arm_positions, _)
-                        elif target == 'tool':
-                            CMD_HANDLER_MAP[cmd][target](robot, tool_positions, _)
-                    elif cmd == 'relax':
-                        CMD_HANDLER_MAP[cmd](robot, _)
-                    elif cmd == 'say':
-                        CMD_HANDLER_MAP[cmd](robot, _)
-                    elif cmd == 'delay':
-                        CMD_HANDLER_MAP[cmd](robot, _)
-                    elif cmd == 'hold':
-                        CMD_HANDLER_MAP[cmd](robot, _)
-                    elif cmd == 'home':
-                        CMD_HANDLER_MAP[cmd](robot, _)
-                    elif cmd == 'send':
-                        if target  == 'head':
-                            print(f"\n\n\n\n\nSending data to head: ")
-                            if head:
-                                head.write(_['data'].encode())
-                    elif cmd == 'wait_for_trigger':
-                        print("Waiting for trigger")
-                        triggered = CMD_HANDLER_MAP[cmd](robot, _)
-                        if triggered:
-                            print(f"Triggered")
-                            if 'on_trigger' in _:
-                                if _['on_trigger'] == 'restart':
-                                    break
-                        else:
-                            print(f"Timed out")
-                            if 'on_timeout' in _:
-                                if _['on_timeout'] == 'restart':
-                                    break
-                t2 = datetime.now()
-                if (t2 - start_time).seconds >= 1:
-                    robot.report()
-                    start_time = t2
+            if not wait_for_delay:
+                _ = None
+                try:
+                    _ = next(playlist_iterator)
+                    cmd = _['cmd']
+                    target = _['target'] if 'target' in _ else None
+
+                    if cmd in CMD_HANDLER_MAP.keys():
+                        if cmd == 'move':
+                            if target == 'arm':
+                                CMD_HANDLER_MAP[cmd][target](robot, arm_positions, _)
+                            elif target == 'tool':
+                                CMD_HANDLER_MAP[cmd][target](robot, tool_positions, _)
+                        elif cmd == 'relax':
+                            CMD_HANDLER_MAP[cmd](robot, _)
+                        elif cmd == 'say':
+                            CMD_HANDLER_MAP[cmd](robot, _)
+                        elif cmd == 'delay':
+                            #CMD_HANDLER_MAP[cmd](robot, _)
+                            delay_start = datetime.now()
+                            delay_for_s = _['seconds']
+                            wait_for_delay = True
+                        elif cmd == 'hold':
+                            CMD_HANDLER_MAP[cmd](robot, _)
+                        elif cmd == 'home':
+                            CMD_HANDLER_MAP[cmd](robot, _)
+                        elif cmd == 'send':
+                            if target  == 'head':
+                                print(f"\n\n\n\n\nSending data to head: ")
+                                if head:
+                                    head.write(_['data'].encode())
+                        elif cmd == 'wait_for_trigger':
+                            print("Waiting for trigger")
+                            triggered = CMD_HANDLER_MAP[cmd](robot, _)
+                            if triggered:
+                                print(f"Triggered")
+                                if 'on_trigger' in _:
+                                    if _['on_trigger'] == 'restart':
+                                        break
+                            else:
+                                print(f"Timed out")
+                                if 'on_timeout' in _:
+                                    if _['on_timeout'] == 'restart':
+                                        break
+
+                except StopIteration as e:
+                    print(f"{e!r}")
+                    playlist_iterator = iter(playlist)
+
+            else:
+                if (datetime.now() - delay_start).seconds >= delay_for_s:
+                    wait_for_delay = False
+            t2 = datetime.now()
+            if (t2 - start_time).seconds >= 0.1:
+                robot.report()
+                start_time = t2
 
     except KeyboardInterrupt:
         #242 2254 462
         robot.relax_all()
 
-                
-                      
 
 
 if __name__ == "__main__":

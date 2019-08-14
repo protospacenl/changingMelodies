@@ -103,20 +103,24 @@ class Controller(metaclass=Singleton):
                 break
             s += c
 
+        print(s)
         v = s.decode().split(',')
 
-        if len(v) <= 1 or len(v) > 5:
+        if len(v) <= 1 or len(v) > 6:
             return False
 
+        current = int(v[4])
+        current = 0.0038 * (current - 2048)
+
         errors = ''
-        error_byte = int(v[3])
+        error_byte = int(v[5])
         for e in self.ERR_DICT:
             if error_byte & e['mask']:
                 errors = errors + " " + e['name']
         if errors == '':
             errors = 'NONE'
 
-        print(f"{name} -> Pos: {v[0]}, Voltage: {int(v[1])/10}, Temperature: {v[2]}, Error: {errors}")
+        print(f"{name} -> Fwv: {v[0]}, Pos: {v[1]}, Voltage: {int(v[2])/10}, Temperature: {v[3]}, A: {current}, Error: {errors}")
         return True
 
 

@@ -27,7 +27,7 @@
     "joints": [
         {   
             "name": "shoulder_rot",
-            "type": "AX",
+            "type": "MX",
             "id": 1,
             "params": {
                 "cw_angle_limit": 202,
@@ -47,7 +47,7 @@
         },
         {   
             "name": "wrist",
-            "type": "AX",
+            "type": "MX",
             "id": 3,
             "params": {
                 "cw_angle_limit": 190,
