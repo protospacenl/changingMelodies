@@ -25,7 +25,7 @@
 #define PATRICK_FRAME_DELAY 33
 #define POSITION_SHIFT      3
 
-#define MAX_SERVOS          3
+#define MAX_SERVOS          16
 #define SERVO_TYPE_AX       0
 #define SERVO_TYPE_MX       1
 
@@ -37,6 +37,7 @@
 typedef struct {
     uint8_t id;
     uint8_t type;
+    uint8_t P;
     int current_position;
     int current_position_set;
     int next_position;
@@ -50,6 +51,18 @@ typedef struct {
     unsigned long last_frame;
 } servo_t; 
 
+typedef struct {
+    uint8_t id;
+    int position; 
+    int voltage;
+    int temperature;
+    int load;
+    uint8_t type;
+    int fw_version;
+    int error;
+    uint8_t P;
+} servo_report_t;
+
 /** Patrick Controller Class for mega324p/644p clients. **/
 class PatrickController
 {
@@ -57,10 +70,17 @@ class PatrickController
     /* For compatibility with legacy code */
     PatrickController(long baud);               // baud usually 1000000
 
-    int addServo(uint8_t id, uint8_t type);
+    int addServo(uint8_t id, uint8_t type, uint8_t P);
     servo_t * getServo(uint8_t id);
     void updateServos(void);
     void initNextPosition(uint8_t id, int position);
+
+    uint8_t get_num_servos(void) { return nservos; };
+    servo_t * getServoByIdx(uint8_t idx) {
+        if (idx >= nservos)
+            return NULL;
+        return &servos[idx];
+    }
 
     void setServoSpeed(uint8_t id, int speed) {
         servo_t *servo = getServo(id);
@@ -88,6 +108,26 @@ class PatrickController
         delay(PATRICK_FRAME_DELAY);
     };
 
+    uint8_t getServoReport(servo_t *servo, servo_report_t *report) {
+        if (servo == NULL || report == NULL) {
+            report->id = 255;
+            return -1;
+        }
+      
+        uint8_t id = servo->id;
+      
+        report->id = id;
+        report->position = dxlGetPosition(id); 
+        report->voltage = dxlGetVoltage(id);
+        report->temperature = dxlGetTemperature(id);
+        report->type = servo->type;
+        report->fw_version = dxlGetFirmwareVersion(id);
+        report->error = dxlGetError(id);
+        report->P = servo->P;
+        report->load = dxlGetTorque(id);
+
+        return 0;
+    };
 
   private:  
     uint8_t nservos;

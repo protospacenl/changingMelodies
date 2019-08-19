@@ -18,6 +18,7 @@ uint8_t CMD_HEADER[2] = {0xff, 0xff};
 typedef struct __attribute__(( packed)) cmd_add_servo_t {
     uint8_t id;
     uint8_t type;
+    uint8_t P;
 } cmd_add_servo_t;
 
 typedef struct __attribute__(( packed)) cmd_speed_t {

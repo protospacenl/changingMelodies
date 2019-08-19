@@ -59,7 +59,7 @@ int handle_command(command_t *msg, PatrickController *controller)
 
     if (msg->cmd == CMD_ADD_SERVO) {
         cmd_add_servo_t * cmd = (cmd_add_servo_t*)&msg->params;
-        retval = controller->addServo(cmd->id, cmd->type);
+        retval = controller->addServo(cmd->id, cmd->type, cmd->P);
         if (retval > 0) {
             Serial.write(retval);
         } else {
@@ -69,56 +69,63 @@ int handle_command(command_t *msg, PatrickController *controller)
         tool_home();
     } else if (msg->cmd == CMD_SERVO_REPORT) {
         cmd_servo_report_t * cmd = (cmd_servo_report_t*)&msg->params;
+
+        servo_report_t report;
         servo_t *servo = controller->getServo(cmd->id);
+        controller->getServoReport(servo, &report);
 
-        if (servo != NULL) {
-            int pos = dxlGetPosition(cmd->id); 
-            int v = dxlGetVoltage(cmd->id);
-            int t = dxlGetTemperature(cmd->id);
-            int a = -1;
-            int fwv = dxlGetFirmwareVersion(cmd->id);
-            int err = dxlGetError(cmd->id);
-            
-            if (servo->type == SERVO_TYPE_MX) {
-                a = mxGetCurrent(cmd->id);
-            }
-
-            Serial.print(fwv);
-            Serial.print(",");
-            Serial.print(pos);
-            Serial.print(",");
-            Serial.print(v);
-            Serial.print(",");
-            Serial.print(t);
-            Serial.print(",");
-            Serial.print(a);
-            Serial.print(",");
-            Serial.print(err);
-            Serial.println("");
-        }
+        Serial.print(report.id);
+        Serial.print(",");
+        Serial.print(report.type);
+        Serial.print(",");
+        Serial.print(report.fw_version);
+        Serial.print(",");
+        Serial.print(report.position);
+        Serial.print(",");
+        Serial.print(report.voltage);
+        Serial.print(",");
+        Serial.print(report.temperature);
+        Serial.print(",");
+        Serial.print(report.load);
+        Serial.print(",");
+        Serial.print(report.error);
+        Serial.println("");
         
     } else if (msg->cmd == CMD_MONITOR) {
-        int pos1 = dxlGetPosition(1); 
-        int pos2 = dxlGetPosition(2); 
-        int pos3 = dxlGetPosition(3); 
-        Serial.print(pos1);
-        Serial.print(", ");
-        Serial.print(pos2);
-        Serial.print(", ");
-        Serial.println(pos3);
+        uint8_t idx;
+        uint8_t n = controller->get_num_servos();
+
+        for (idx=0; idx<n; idx++) {
+            int pos;
+            servo_t *s = controller->getServoByIdx(idx);
+            if (s == NULL)
+                continue;
+            
+            pos = dxlGetPosition(s->id);
+
+            if (idx > 0) Serial.print(", ");
+            Serial.print("{id: "); Serial.print(s->id); 
+            Serial.print(", pos:"); Serial.print(pos);
+            Serial.print("}");
+        }
+        Serial.println("");
+
     } else if (msg->cmd == CMD_HOLD) {
-        int pos1 = dxlGetPosition(1); 
-        int pos2 = dxlGetPosition(2); 
-        int pos3 = dxlGetPosition(3); 
-        dxlTorqueOn(1);
+        cmd_hold_t * cmd = (cmd_hold_t*)&msg->params;
+        int pos1 = dxlGetPosition(cmd->id); 
+        //int pos2 = dxlGetPosition(2); 
+        //int pos3 = dxlGetPosition(3); 
+        dxlTorqueOn(cmd->id);
         delay(3);
-        __patrick.setServoPosition(1, pos1);
+        controller->setServoPosition(cmd->id, pos1);
+        /*
         dxlTorqueOn(2);
         delay(3);
         __patrick.setServoPosition(2, pos2);
         dxlTorqueOn(3);
         delay(3);
         __patrick.setServoPosition(3, pos3);
+        */
     } else if (msg->cmd == CMD_TOOL_POSITION) {
         cmd_tool_position_t * cmd = (cmd_tool_position_t*)&msg->params;
         __spindle_z.goTo(cmd->z);

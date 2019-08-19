@@ -28,7 +28,7 @@ PatrickController::PatrickController(long baud)
     nservos = 0;
 }
 
-int PatrickController::addServo(uint8_t id, uint8_t type)
+int PatrickController::addServo(uint8_t id, uint8_t type, uint8_t P)
 {
     int i;
     uint16_t position;
@@ -45,6 +45,10 @@ int PatrickController::addServo(uint8_t id, uint8_t type)
     servos[nservos].type = type;
     servos[nservos].running = 0;
 
+    if (type == SERVO_TYPE_MX) {
+      mxSetP(id, P);
+    }
+    
     dxlLEDOn(id);
     delay(100);
     dxlLEDOff(id);
