@@ -10,6 +10,7 @@ class Robot():
         self.__controller = Controller(**controller)
         self.__sensors = {}
         self.__joints = {}
+        self.__id_map = [None] * 255
 
         self.__init_sensors(sensors)
 
@@ -32,6 +33,18 @@ class Robot():
     @property
     def joints(self):
         return list(self.__joints.keys())
+
+    @property
+    def joint_ids(self):
+        return [ j.id for j in self.__joints ]
+
+    def get_joint_by_name(self, name):
+        if name in self.__joints:
+            return self.__joints[name]
+        return None
+
+    def get_joint_by_id(self, id):
+        return(self.__id_map[id])
    
     def connect(self):
         return self.__controller.connect()
@@ -61,6 +74,7 @@ class Robot():
 
         self.__controller.add_servo(nj.id, nj.type_id, P)
         self.__joints[nj.name] = nj
+        self.__id_map[nl.id] = nj
         
         return nj
 
@@ -104,8 +118,9 @@ class Robot():
     def tool_home(self):
         self.__controller.tool_home()
 
-    def monitor(self):
-        return self.__controller.monitor()
+    def get_positions(self):
+        positions = self.__controller.get_positions()
+        return { self.get_joint_by_id(p[0]).name:p[1] for p in positions }
 
     def report(self):
         print("\n************** SERVO REPORT *************\n")

@@ -103,10 +103,10 @@ int handle_command(command_t *msg, PatrickController *controller)
             
             pos = dxlGetPosition(s->id);
 
-            if (idx > 0) Serial.print(", ");
-            Serial.print("{id: "); Serial.print(s->id); 
-            Serial.print(", pos:"); Serial.print(pos);
-            Serial.print("}");
+            if (idx > 0) Serial.print(",");
+            Serial.print(s->id);
+            Serial.print(':'); 
+            Serial.print(pos);
         }
         Serial.println("");
 

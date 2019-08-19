@@ -87,9 +87,12 @@ class Controller(metaclass=Singleton):
             if c == self.CMD_ACK:
                 break
             s += c
-        print(f"{s}")
+        #print(f"{s}")
 
-        return s
+        v = s.decode().split(',')
+        positions = [ [ int(x[0]), int(x[1]) ] for x in [ v.split(':') for v in v ] ]
+
+        return positions
 
     def report(self, name, id):
         self.write(struct.pack('H', self.CMD_HEADER))

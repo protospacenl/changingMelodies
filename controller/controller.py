@@ -15,6 +15,21 @@ from cmrobot import Robot
 CONFIG_PATH = './config.json'
 PLAYLIST_PATH = './playlist.json'
 
+PLAYLIST_TEMPLATE = { 
+        'positions': { 
+            'arm': {}, 
+            'tool': {} 
+        }, 
+        'playlist': [ 
+            { "target": "touch", 
+              "cmd": "_wait_for_trigger", 
+              "timeout": 10, 
+              "on_timeout": "restart", 
+              "#": "Wait for trigger"
+            }
+        ]
+    }
+
 def handle_move_arm(robot, positions, cmd):
     if cmd['position'] in positions:
         p = positions[cmd['position']]['joints']
@@ -88,15 +103,12 @@ def main(argv):
     config          = None
     playlist        = None
     head            = None
-    monitor         = False
     interactive     = False
-    outpath         = None
-    outfile         = None
 
     try:
-        opts, args = getopt.getopt(argv[1:], "hc:p:o:mi", ["config=","playlist=","out=", "monitor","interactive"])
+        opts, args = getopt.getopt(argv[1:], "hc:p:i", ["config=","playlist=","interactive"])
     except getopt.GetoptError:
-        print('{} -c <config> -p <playlist> -o <path> -m -i'.format(sys.argv[0]))
+        print('{} -c <config> -p <playlist> -o <path> -i'.format(sys.argv[0]))
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
@@ -106,10 +118,6 @@ def main(argv):
             config_path = arg
         elif opt in ("-p", "--playlist"):
             playlist_path = arg
-        elif opt in ("-o", "--out"):
-            outpath = arg
-        elif opt in ("-m", "--monitor"):
-            monitor = True
         elif opt in ("-i", "--interactive"):
             interactive = True
 
@@ -119,8 +127,6 @@ def main(argv):
     with open(playlist_path, 'r') as f:
         playlist = json.load(f)
 
-    if outpath:
-        outfile = open(outpath, 'a+')
 
     mixer.init(frequency=8000)
 
@@ -149,22 +155,34 @@ def main(argv):
         head = serial.Serial(head_config['port'], head_config['baudrate'], timeout=head_config['timeout'])
         print(f"Opened connection to the head")
 
-    if monitor:
-        robot.relax_all()
-        while True:
-            robot.monitor()
-            time.sleep(.5)
-
 
     if interactive:
+        joint_select_str = ""
+        selected_joints = []
+        last_positions = None 
+        outpath = None
+
         robot.relax_all()
-        print("Interactive mode:")
-        print("\t?: help")
-        print("\th: hold")
-        print("\tr: release")
-        print("\tp: print positions")
-        print("\ts: save positions to file given with -o")
-        print("")
+
+        printHelp():
+            print("Interactive mode:")
+            print("\t?: help")
+            print("\th: hold")
+            print("\tr: release")
+            print("\tp: print positions")
+            print("\tn: new file for saving positions (current: {}".format(outpath))
+            print("\ts: save positions file given with -o or n command")
+            print("\tq: quit")
+            print("")
+
+        printHelp()
+
+        for k in robot.joints:
+            j = robot.get_joint_by_name(k):
+                joint_select_str = s + "{}: {}, ".format(j.id, j.name)
+        s = s[:-2]
+
+        selected_joints = robot.joint_ids
 
         while True:
             cmd = input("Command: ").lower()
@@ -175,10 +193,56 @@ def main(argv):
                 print('Relaxing')
                 robot.relax_all()
             elif cmd == 'p':
-                s = robot.monitor()
-                print("positions: {}".format(s))
+                last_positions = robot.get_positions()
+                print("positions: {}".format(last_positions))
+            elif cmd == 'n':
+                outpath = input("filename: ")
+                with open(outpath, 'w') as out:
+                    json.dump(PLAYLIST_TEMPLATE, out, indent=4)
+
+            elif cmd == 's':
+                _playlist = None
+
+                if not outpath:
+                    print("not output file")
+                    continue
+
+                with open(outpath, 'r') as out:
+                    _playlist = json.load(out)
+
+                if not last_positions:
+                    last_positions = robot.get_positions()
+
+                print("positions: {}".format(last_positions))
+                
+                name = input("name: ")
+                joints = input("joints (0 for all) [{}]\nCurrent: {}\n> ".format(joint_select_str, selected_joints))
+                
+                if joints != "":
+                    joints = [ int(joint) for joint in joints ]
+                    if 0 in joints:
+                        selected_joints = robot.joint_ids
+                    else:
+                        selected_joints = joints
+                
+                joints = []
+                for i in selected_joints:
+                    jointname = robot.get_joint_by_id(i)
+                    joints.append({'name': jointname, 'pos': last_positions[jointname], 'torque': 200})
+                _playlist['positions']['arm']['name'] = { 'joints': joints }
+                with open(outpath, 'w') as out:
+                    json.dump(_playlist, out, indent=4)
+
+                print("Saved positions")
+
+            elif cmd == 'q':
+                robot.relax_all()
+                sys.exit(1)
+            elif cmd == '?':
+                printHelp()
             else:
                print('unkown command')
+               printHelp()
 
     try:
         start_time      = datetime.now()
