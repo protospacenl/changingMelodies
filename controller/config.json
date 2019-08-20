@@ -1,0 +1,86 @@
+{
+    "version": 1.0,
+ 
+    "head": {
+        "port": "/dev/cm_head",
+        "baudrate": 9600,
+        "timeout": 1
+    },
+
+    "robot": {
+        "controller": {
+            "port": "/dev/cm_controller",
+            "baudrate": 19200,
+            "timeout": 1
+        },
+        
+        "sensors": [
+            { "name": "button1", "gpio": 17, "pull_up": false},
+            { "name": "button2", "gpio": 27, "pull_up": false, "bounce_time": 200 },
+            { "name": "button3", "gpio": 22, "pull_up": false },
+	    { "name": "BOARD_GPIO1", 	 "gpio": 18, "bounce_time": 200, "active_state":false},
+	    { "name": "BOARD_GPIO2", 	 "gpio": 12, "pull_up": false }
+        ],
+
+	"pump": "GPIO4",
+	"start_button": "BOARD_GPIO1"
+    	
+    },
+
+    "joints": [
+        {   
+            "name": "shoulder_rot",
+            "type": "MX",
+            "id": 1,
+            "params": {
+                "cw_angle_limit": 2048,
+                "ccw_angle_limit": 1145,
+		"holding_torque": 10,
+		"PGain": 8 
+            }
+        },
+        {
+            "name": "shoulder_ud",
+            "type": "MX",
+            "id": 2,
+            "params": {
+                "ccw_angle_limit": 1000,
+                "cw_angle_limit": 3050,
+		"holding_torque": 60,
+		"PGain": 16
+            }
+        },
+        {   
+            "name": "wrist",
+            "type": "MX",
+            "id": 3,
+            "params": {
+                "ccw_angle_limit": 2048,
+                "cw_angle_limit": 3220,
+		"holding_torque": 50,
+		"PGain": 16
+            }
+        },
+        {   
+            "name": "neck_rot",
+            "type": "AX",
+            "id": 4,
+            "params": {
+                "cw_angle_limit": 190,
+                "ccw_angle_limit": 788,
+		"holding_torque": 1 
+            }
+	},
+        {   
+            "name": "neck_up",
+            "type": "AX",
+            "id": 5,
+            "params": {
+                "cw_angle_limit": 190,
+                "ccw_angle_limit": 788,
+		"holding_torque": 100 
+            }
+        }
+ 
+    ]
+}
