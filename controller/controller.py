@@ -127,7 +127,6 @@ def main(argv):
     with open(playlist_path, 'r') as f:
         playlist = json.load(f)
 
-
     mixer.init(frequency=8000)
 
     robot_config = config['robot']
@@ -157,6 +156,17 @@ def main(argv):
 
 
     if interactive:
+        def printHelp():
+            print("Interactive mode:")
+            print("\t?: help")
+            print("\th: hold")
+            print("\tr: release")
+            print("\tp: print positions")
+            print("\tn: new file for saving positions (current: {})".format(outpath))
+            print("\ts: save positions file given with 'n' command")
+            print("\tq: quit")
+            print("")
+
         joint_select_str = ""
         selected_joints = []
         last_positions = None 
@@ -164,23 +174,12 @@ def main(argv):
 
         robot.relax_all()
 
-        printHelp():
-            print("Interactive mode:")
-            print("\t?: help")
-            print("\th: hold")
-            print("\tr: release")
-            print("\tp: print positions")
-            print("\tn: new file for saving positions (current: {}".format(outpath))
-            print("\ts: save positions file given with -o or n command")
-            print("\tq: quit")
-            print("")
-
         printHelp()
 
         for k in robot.joints:
-            j = robot.get_joint_by_name(k):
-                joint_select_str = s + "{}: {}, ".format(j.id, j.name)
-        s = s[:-2]
+            j = robot.get_joint_by_name(k)
+            joint_select_str = joint_select_str + "{}: {}, ".format(j.id, j.name)
+        joint_select_strs = joint_select_str[:-2]
 
         selected_joints = robot.joint_ids
 
@@ -197,6 +196,10 @@ def main(argv):
                 print("positions: {}".format(last_positions))
             elif cmd == 'n':
                 outpath = input("filename: ")
+                
+                outpath = Path(outpath)
+                #if outpath.exists():
+                #    _play
                 with open(outpath, 'w') as out:
                     json.dump(PLAYLIST_TEMPLATE, out, indent=4)
 
@@ -219,6 +222,7 @@ def main(argv):
                 joints = input("joints (0 for all) [{}]\nCurrent: {}\n> ".format(joint_select_str, selected_joints))
                 
                 if joints != "":
+                    joints = joints.split()
                     joints = [ int(joint) for joint in joints ]
                     if 0 in joints:
                         selected_joints = robot.joint_ids
@@ -227,9 +231,9 @@ def main(argv):
                 
                 joints = []
                 for i in selected_joints:
-                    jointname = robot.get_joint_by_id(i)
-                    joints.append({'name': jointname, 'pos': last_positions[jointname], 'torque': 200})
-                _playlist['positions']['arm']['name'] = { 'joints': joints }
+                    joint = robot.get_joint_by_id(i)
+                    joints.append({'name': joint.name, 'pos': last_positions[joint.name], 'torque': 200})
+                _playlist['positions']['arm'][name] = { 'joints': joints }
                 with open(outpath, 'w') as out:
                     json.dump(_playlist, out, indent=4)
 

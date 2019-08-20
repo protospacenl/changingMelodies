@@ -76,7 +76,7 @@ class Controller(metaclass=Singleton):
         self.write(struct.pack('H', self.CMD_HEADER))
         self.write(bytes([self.CMD_TOOL_HOME, 1, 0]), wait=True)
 
-    def monitor(self):
+    def get_positions(self):
         self.write(struct.pack('H', self.CMD_HEADER))
         self.write(bytes([self.CMD_SERVO_MONITOR, 1, 0]))
         s = b''

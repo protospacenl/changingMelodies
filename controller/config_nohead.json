@@ -25,7 +25,7 @@
             "params": {
                 "cw_angle_limit": 2048,
                 "ccw_angle_limit": 1145,
-		"holding_torque": 0,
+		"holding_torque": 10,
 		"PGain": 8 
             }
         },

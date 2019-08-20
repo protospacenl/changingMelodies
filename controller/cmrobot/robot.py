@@ -36,7 +36,7 @@ class Robot():
 
     @property
     def joint_ids(self):
-        return [ j.id for j in self.__joints ]
+        return [ self.__joints[j].id for j in self.__joints ]
 
     def get_joint_by_name(self, name):
         if name in self.__joints:
@@ -74,7 +74,7 @@ class Robot():
 
         self.__controller.add_servo(nj.id, nj.type_id, P)
         self.__joints[nj.name] = nj
-        self.__id_map[nl.id] = nj
+        self.__id_map[nj.id] = nj
         
         return nj
 
