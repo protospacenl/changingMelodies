@@ -1,34 +1,54 @@
 import serial
 import time
-from gpiozero import Button, DigitalOutputDevice
+from gpiozero import DigitalOutputDevice
+import RPi.GPIO as GPIO
 
 from cmrobot.joint import JointAX, JointMX
 from cmrobot.controller import Controller
 
 class Robot():
-    def __init__(self, controller=None, sensors=None, pump="GPIO4"):
+    def __init__(self, controller=None, sensors=None, pump="GPIO4", start_button=None):
         self.__controller = Controller(**controller)
         self.__sensors = {}
         self.__gpio = {}
-        self.__joints = {}
         self.__pump = None
+        self.__start_button = None
         self.__id_map = [None] * 255
+        self.__joints = {}
 
-        self.__init_sensors(sensors)
+        GPIO.setmode(GPIO.BCM)
+        self.__init_sensors(sensors, start_button)
         self.__init_pump(pump)
 
 
-    def __init_sensors(self, sensors):
+    def __init_sensors(self, sensors, start_button):
         if sensors == None:
             return
 
         for s in sensors:
-            pull_up = s['pull_up'] if 'pull_up' in s else None
-            bounce_time = s['bounce_time'] if 'bounce_time' in s else None
-            active_state= s['active_state'] if 'active_state' in s else None
-            gpio = Button(s['gpio'], pull_up=pull_up, bounce_time=bounce_time, active_state=active_state)
-            print(f"Added GPIO {s['name']}: {gpio!r}, bounce_time: {gpio.pin.bounce}")
+            pull = s['pull_up'] if 'pull_up' in s else None
+            bounce_time = s['bounce_time'] if 'bounce_time' in s else 200
+            active_state= s['active_state'] if 'active_state' in s else True
+
+            if pull == True:
+                pull = GPIO.PUD_UP
+            elif pull == False:
+                pull = GPIO.PUD_DOWN
+
+            #gpio = Button(s['gpio'], pull_up=pull_up, bounce_time=bounce_time, active_state=active_state)
+            gpio = None
+            if pull:
+                gpio = GPIO.setup(s['gpio'], GPIO.IN, pull)
+            else:
+                gpio = GPIO.setup(s['gpio'], GPIO.IN)
+
+            print(f"Added GPIO {s['name']}: {gpio!r}, bounce_time: {bounce_time}")
             self.__sensors[s['name']] = gpio
+
+            if start_button == s['name']:
+                self.__start_button = s['gpio']
+                #GPIO.add_event_detect(self.__start_button, GPIO.FALLING if not active_state else GPIO.RISING, bouncetime=bounce_time)
+        
 
     def __init_pump(self, pump):
         self.__pump = DigitalOutputDevice(pump)
@@ -36,10 +56,25 @@ class Robot():
     def get_sensor(self, name):
         if name in self.__sensors:
             return self.__sensors[name]
+        return None
 
     @property
     def pump(self):
         return self.__pump
+
+    @property
+    def start_button(self):
+        return self.__start_button
+
+    @property
+    def start_button_state(self):
+        return GPIO.input(self.__start_button)
+
+    def start_button_event_detected(self):
+        return GPIO.event_detected(self.__start_button)
+
+    def start_button_wait_for_press(self):
+        GPIO.wait_for_edge(self.__start_button, GPIO.FALLING)
 
     @property
     def joints(self):

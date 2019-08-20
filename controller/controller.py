@@ -179,7 +179,6 @@ def main(argv):
         head = serial.Serial(head_config['port'], head_config['baudrate'], timeout=head_config['timeout'])
         print(f"Opened connection to the head")
 
-
     if interactive:
         def printHelp():
             print("Interactive mode:")
@@ -281,12 +280,40 @@ def main(argv):
         delay_start     = None
         delay_for_s     = None
         wait_for_delay  = False
+        wait_for_start  = True
+        reset_playlist  = False
 
         playlist_iterator = iter(playlist)
 
+        print("Wait for START")
         while True:
+            if robot.start_button:
+                if not wait_for_start:
+                    if not robot.start_button_state: 
+                        time.sleep(0.5)
+                        if not robot.start_button_state:
+                            print("restart playlist")
+                            robot.relax_all()
+                            robot.pump.off()
+                            playlist_iterator = iter(playlist)
+                            wait_for_start = True
+
+                            while not robot.start_button_state:
+                                pass
+                            continue
+                else:
+                    if not robot.start_button_state:
+                        time.sleep(0.5)
+                        if not robot.start_button_state:
+                            wait_for_start = False
+                        else:
+                            continue
+                    else:
+                        continue
+                 
             if not wait_for_delay:
                 _ = None
+
                 try:
                     _ = next(playlist_iterator)
                     cmd = _['cmd']
@@ -337,6 +364,8 @@ def main(argv):
                 except StopIteration as e:
                     print(f"{e!r}")
                     playlist_iterator = iter(playlist)
+                    wait_for_start = True
+                    print("Wait for START")
 
             else:
                 if (datetime.now() - delay_start).seconds >= delay_for_s:

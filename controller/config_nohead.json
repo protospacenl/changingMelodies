@@ -9,14 +9,15 @@
         },
         
         "sensors": [
-            { "name": "button1", "gpio": "GPIO17", "pull_up": false},
-            { "name": "button2", "gpio": "GPIO27", "pull_up": false, "bounce_time": 1.0 },
-            { "name": "button3", "gpio": "GPIO22", "pull_up": false },
-	    { "name": "GPIO1", 	 "gpio": "GPIO18", "pull_up": false },
-	    { "name": "GPIO2", 	 "gpio": "GPIO12", "pull_up": false }
+            { "name": "button1", "gpio": 17, "pull_up": false},
+            { "name": "button2", "gpio": 27, "pull_up": false, "bounce_time": 200 },
+            { "name": "button3", "gpio": 22, "pull_up": false },
+	    { "name": "BOARD_GPIO1", 	 "gpio": 18, "bounce_time": 200, "active_state":false},
+	    { "name": "BOARD_GPIO2", 	 "gpio": 12, "pull_up": false }
         ],
 
-	"pump": "GPIO4" 
+	"pump": "GPIO4",
+	"start_button": "BOARD_GPIO1"
     	
     },
 
