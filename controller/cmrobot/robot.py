@@ -1,18 +1,22 @@
 import serial
 import time
-from gpiozero import Button
+from gpiozero import Button, DigitalOutputDevice
 
 from cmrobot.joint import JointAX, JointMX
 from cmrobot.controller import Controller
 
 class Robot():
-    def __init__(self, controller=None, sensors=None):
+    def __init__(self, controller=None, sensors=None, pump="GPIO4"):
         self.__controller = Controller(**controller)
         self.__sensors = {}
+        self.__gpio = {}
         self.__joints = {}
+        self.__pump = None
         self.__id_map = [None] * 255
 
         self.__init_sensors(sensors)
+        self.__init_pump(pump)
+
 
     def __init_sensors(self, sensors):
         if sensors == None:
@@ -26,9 +30,16 @@ class Robot():
             print(f"Added GPIO {s['name']}: {gpio!r}, bounce_time: {gpio.pin.bounce}")
             self.__sensors[s['name']] = gpio
 
+    def __init_pump(self, pump):
+        self.__pump = DigitalOutputDevice(pump)
+
     def get_sensor(self, name):
         if name in self.__sensors:
             return self.__sensors[name]
+
+    @property
+    def pump(self):
+        return self.__pump
 
     @property
     def joints(self):
@@ -130,5 +141,3 @@ class Robot():
 
     def move_tool_to(self, position, speed=10):
         self.__controller.write_tool_pos(position['x'], position['z'], speed)
-
-

@@ -27,15 +27,20 @@
     },
 
     "playlist": [
+        { "target": "pump",  "cmd": "on" },
         { "target": "arm",  "cmd": "move",   "position": "up", "speed": 300 },
         { "target": "head",  "cmd": "move",   "position": "up", "speed": 100 },
         { "target": "_",    "cmd": "delay",  "seconds": 2 },
+        { "target": "pump",  "cmd": "off" },
         { "target": "arm",  "cmd": "move",   "position": "relax", "speed": 300 },
 	{ "target": "_",    "cmd": "relax",  "joint": "shoulder_rot" },
         { "target": "_",    "cmd": "delay",  "seconds": 5 },
         { "target": "arm",  "cmd": "move",   "position": "rest", "speed": 300 },
         { "target": "head", "cmd": "move",  "position": "rest", "speed": 200 },
         { "target": "arm",  "cmd": "hold",   "joint": "all"},
-        { "target": "_",    "cmd": "delay",  "seconds": 5 }
+        { "target": "pump",  "cmd": "pulse",   "on_time": 2},
+        { "target": "_",    "cmd": "delay",  "seconds": 5 },
+        { "target": "pump",  "cmd": "pulse",   "on_time": 0.5, "off_time": 0.5, "n":5},
+        { "target": "_",    "cmd": "delay",  "seconds": 10 }
     ]
 }

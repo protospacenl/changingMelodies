@@ -81,6 +81,28 @@ def handle_wait_trigger(robot, cmd):
     print(f"Triggered: {t!r}, Value: {s.value}")
     return t
 
+def handle_pump_on(robot, cmd):
+    print("Pump ON")
+    robot.pump.on()
+
+def handle_pump_off(robot, cmd):
+    print("Pump OFF")
+    robot.pump.off()
+
+def handle_pump_pulse(robot, cmd):
+    on_time = 1
+    off_time = 1
+    repeats = 1
+    if 'on_time' in cmd:
+        on_time = cmd['on_time']
+    if 'off_time' in cmd:
+        off_time = cmd['off_time']
+
+    if 'n' in cmd:
+        repeats = cmd['n']
+
+    print("Pump pulsing {} times ({} on, {} off)".format(repeats, on_time, off_time))
+    robot.pump.blink(on_time=on_time, off_time=off_time, n=repeats)
 
 CMD_HANDLER_MAP = {
         'move': { 
@@ -94,7 +116,10 @@ CMD_HANDLER_MAP = {
         'home': handle_home,
         'delay': handle_delay,
         'wait_for_trigger': handle_wait_trigger,
-        "send" : None
+        'send' : None,
+        'on': { 'pump': handle_pump_on },
+        'off': { 'pump': handle_pump_off },
+        'pulse' : { 'pump': handle_pump_pulse }
     }
 
 def main(argv):
@@ -164,6 +189,7 @@ def main(argv):
             print("\tp: print positions")
             print("\tn: new file for saving positions (current: {})".format(outpath))
             print("\ts: save positions file given with 'n' command")
+            print("\tw: pulse water pump")
             print("\tq: quit")
             print("")
 
@@ -239,6 +265,8 @@ def main(argv):
 
                 print("Saved positions")
 
+            elif cmd == 'w':
+                robot.pump.blink(on_time=1, n=1)
             elif cmd == 'q':
                 robot.relax_all()
                 sys.exit(1)
@@ -303,7 +331,9 @@ def main(argv):
                                 if 'on_timeout' in _:
                                     if _['on_timeout'] == 'restart':
                                         break
-
+                        if cmd == 'on' or cmd == 'off' or cmd == 'pulse':
+                            if target == 'pump':
+                                CMD_HANDLER_MAP[cmd][target](robot, _)
                 except StopIteration as e:
                     print(f"{e!r}")
                     playlist_iterator = iter(playlist)
@@ -319,8 +349,8 @@ def main(argv):
     except KeyboardInterrupt:
         #242 2254 462
         robot.relax_all()
+        robot.pump.off()
 
-    close(outfile)
 
 if __name__ == "__main__":
     main(sys.argv)

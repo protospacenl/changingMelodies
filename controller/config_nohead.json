@@ -9,12 +9,15 @@
         },
         
         "sensors": [
-            { "name": "touch", "gpio": "GPIO6", "pull_up": true},
-            { "name": "reset", "gpio": "GPIO13", "pull_up": true, "bounce_time": 1.0 },
-            { "name": "sit",   "gpio": "GPIO19", "pull_up": false },
-            { "name": "other", "gpio": "GPIO26", "pull_up": false }
-        ]
+            { "name": "button1", "gpio": "GPIO17", "pull_up": false},
+            { "name": "button2", "gpio": "GPIO27", "pull_up": false, "bounce_time": 1.0 },
+            { "name": "button3", "gpio": "GPIO22", "pull_up": false },
+	    { "name": "GPIO1", 	 "gpio": "GPIO18", "pull_up": false },
+	    { "name": "GPIO2", 	 "gpio": "GPIO12", "pull_up": false }
+        ],
 
+	"pump": "GPIO4" 
+    	
     },
 
     "joints": [
